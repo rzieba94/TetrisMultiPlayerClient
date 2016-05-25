@@ -151,10 +151,26 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Brick.h" />
+    <ClInclude Include="MoveType.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TetrisShape.h" />
+    <ClInclude Include="Tetromino.h" />
+    <ClInclude Include="TetrominoFactory.h" />
+    <ClInclude Include="TetrominoI.h" />
+    <ClInclude Include="TetrominoJ.h" />
+    <ClInclude Include="TetrominoL.h" />
+    <ClInclude Include="TetrominoO.h" />
+    <ClInclude Include="TetrominoS.h" />
+    <ClInclude Include="TetrominosGroup.h" />
+    <ClInclude Include="TetrominoT.h" />
+    <ClInclude Include="TetrominoType.h" />
+    <ClInclude Include="TetrominoZ.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Brick.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -162,6 +178,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TetrisMultiplayerClient.cpp" />
+    <ClCompile Include="TetrisShape.cpp" />
+    <ClCompile Include="Tetromino.cpp" />
+    <ClCompile Include="TetrominoFactory.cpp" />
+    <ClCompile Include="TetrominoI.cpp" />
+    <ClCompile Include="TetrominoJ.cpp" />
+    <ClCompile Include="TetrominoL.cpp" />
+    <ClCompile Include="TetrominoO.cpp" />
+    <ClCompile Include="TetrominoS.cpp" />
+    <ClCompile Include="TetrominosGroup.cpp" />
+    <ClCompile Include="TetrominoT.cpp" />
+    <ClCompile Include="TetrominoZ.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TetrisMultiplayerClient.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
