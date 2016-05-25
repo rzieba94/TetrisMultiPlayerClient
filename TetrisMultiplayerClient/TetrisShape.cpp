@@ -2,7 +2,7 @@
 #include "TetrisShape.h"
 
 
-TetrisShape::TetrisShape(sf::Vector2i * position)
+TetrisShape::TetrisShape(sf::Vector2i & position)
 {
 	this->position = position;
 }

@@ -18,7 +18,7 @@ TetrominoFactory::~TetrominoFactory()
 {
 }
 
-Tetromino * TetrominoFactory::getTetromino(sf::Vector2i * position, const sf::Color * color, TetrominoType tetrominoType)
+Tetromino * TetrominoFactory::getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType & tetrominoType)
 {
 	switch (tetrominoType)
 	{
@@ -39,17 +39,17 @@ Tetromino * TetrominoFactory::getTetromino(sf::Vector2i * position, const sf::Co
 	}
 }
 
-Tetromino * TetrominoFactory::getTetromino(sf::Vector2i * position, TetrominoType tetrominoType)
+Tetromino * TetrominoFactory::getTetromino(sf::Vector2i & position, const TetrominoType & tetrominoType)
 {
 	return getTetromino(position, getRandomColor(), tetrominoType);
 }
 
-Tetromino * TetrominoFactory::getRandomTetromino(sf::Vector2i * position, const sf::Color * color)
+Tetromino * TetrominoFactory::getRandomTetromino(sf::Vector2i & position, const sf::Color * color)
 {
 	return getTetromino(position, color, getRandomTetrominoType());
 }
 
-Tetromino * TetrominoFactory::getRandomTetromino(sf::Vector2i * position)
+Tetromino * TetrominoFactory::getRandomTetromino(sf::Vector2i & position)
 {
 	return getRandomTetromino(position, getRandomColor());
 }
@@ -75,7 +75,7 @@ const sf::Color * TetrominoFactory::getRandomColor()
 	}
 }
 
-TetrominoType TetrominoFactory::getRandomTetrominoType()
+const TetrominoType & TetrominoFactory::getRandomTetrominoType()
 {
 	switch (distribution(randomGenerator))
 	{

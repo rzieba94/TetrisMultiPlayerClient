@@ -4,7 +4,7 @@
 class TetrominosGroup : TetrisShape
 {
 public:
-	TetrominosGroup(sf::Vector2i * position);
+	TetrominosGroup(sf::Vector2i & position);
 	~TetrominosGroup();
 };
 

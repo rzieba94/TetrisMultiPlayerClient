@@ -10,13 +10,13 @@ class TetrominoFactory
 public:
 	TetrominoFactory();
 	~TetrominoFactory();
-	Tetromino * getRandomTetromino(sf::Vector2i * position);
-	Tetromino * getRandomTetromino(sf::Vector2i * position, const sf::Color * color);
-	Tetromino * getTetromino(sf::Vector2i * position, TetrominoType tetrominoType);
-	Tetromino * getTetromino(sf::Vector2i * position, const sf::Color * color, TetrominoType tetrominoType);
+	Tetromino * getRandomTetromino(sf::Vector2i & position);
+	Tetromino * getRandomTetromino(sf::Vector2i & position, const sf::Color * color);
+	Tetromino * getTetromino(sf::Vector2i & position, const TetrominoType & tetrominoType);
+	Tetromino * getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType & tetrominoType);
 private:
 	const sf::Color * getRandomColor();
-	TetrominoType getRandomTetrominoType();
+	const TetrominoType & getRandomTetrominoType();
 
 	std::default_random_engine randomGenerator;
 	std::uniform_int_distribution<int> distribution;

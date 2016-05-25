@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include "Tetromino.h"
 
-
-Tetromino::Tetromino(sf::Vector2i * position, const sf::Color * color) : TetrisShape(position)
+Tetromino::Tetromino(sf::Vector2i & position, const sf::Color * color) : TetrisShape(position)
 {
 	this->color = color;
 }
-
 
 Tetromino::~Tetromino()
 {
@@ -37,7 +35,7 @@ bool Tetromino::drop(int rowsCount)
 	return false;
 }
 
-bool Tetromino::checkColision(TetrisShape * tetrisShape, MoveType moveType)
+bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType & moveType)
 {
 	return false;
 }

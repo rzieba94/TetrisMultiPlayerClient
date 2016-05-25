@@ -11,11 +11,11 @@ public:
 	bool moveLeft();
 	bool moveDown();
 	bool drop(int rowsCount);
-	bool checkColision(TetrisShape * tetrisShape, MoveType moveType);
+	bool checkColision(TetrisShape & tetrisShape, MoveType & moveType);
 	void getDrawableItems();
 	void clearLine(int lineNumber);
 protected:
-	Tetromino(sf::Vector2i * position, const sf::Color * color);
+	Tetromino(sf::Vector2i & position, const sf::Color * color);
 	const sf::Color * color;
 };
 
