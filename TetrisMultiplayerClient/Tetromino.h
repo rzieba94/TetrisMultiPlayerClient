@@ -5,6 +5,8 @@
 #include <memory>
 #include <SFML/Graphics/Color.hpp>
 
+using namespace std;
+
 class Tetromino : public TetrisShape
 {
 public:
@@ -14,12 +16,16 @@ public:
 	void moveLeft();
 	void moveDown();
 	void drop(int rowsCount);
-	bool checkColision(TetrisShape & tetrisShape, MoveType & moveType);
-	std::list<sf::RectangleShape> getDrawableItems();
+	int getDropCount(TetrisShape & tetrisShape, int boardWidth);
+	bool checkColision(TetrisShape & tetrisShape, MoveType moveType, int boardWidth);
+	list<sf::RectangleShape> getDrawableItems();
 	void clearLine(int lineNumber);
+	list<shared_ptr<Brick>> getBricksList();
 protected:
 	Tetromino(sf::Vector2i & position, const sf::Color * color);
 	const sf::Color * color;
-	std::list<std::shared_ptr<Brick>> bricksList;
+	list<shared_ptr<Brick>> bricksList;
+private:
+	bool checkColision(sf::Vector2i currentBrickPosition, int boardWidth, list <shared_ptr<Brick>> otherBricksList);
 };
 

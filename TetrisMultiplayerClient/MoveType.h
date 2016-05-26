@@ -3,5 +3,6 @@ enum MoveType {
 	LEFT,
 	RIGHT,
 	DOWN,
-	DROP
+	DROP,
+	ROTATE
 };

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Tetromino.h"
+#include <iostream>
 
 Tetromino::Tetromino(sf::Vector2i & position, const sf::Color * color) : TetrisShape(position)
 {
@@ -12,7 +13,7 @@ Tetromino::~Tetromino()
 
 void Tetromino::rotate()
 {
-	for (std::shared_ptr<Brick> brick : bricksList)
+	for (shared_ptr<Brick> brick : bricksList)
 	{
 		int newX = position.x + position.y - brick->getPosition().y - Brick::BRICK_SIZE;
 		int newY = brick->getPosition().x + position.y - position.x;
@@ -23,7 +24,7 @@ void Tetromino::rotate()
 void Tetromino::moveRight()
 {
 	position.x += Brick::BRICK_SIZE;
-	for (std::shared_ptr<Brick> brick : bricksList)
+	for (shared_ptr<Brick> brick : bricksList)
 	{
 		brick->move(sf::Vector2i(Brick::BRICK_SIZE, 0));
 	}
@@ -32,7 +33,7 @@ void Tetromino::moveRight()
 void Tetromino::moveLeft()
 {
 	position.x -= Brick::BRICK_SIZE;
-	for (std::shared_ptr<Brick> brick : bricksList)
+	for (shared_ptr<Brick> brick : bricksList)
 	{
 		brick->move(sf::Vector2i(-Brick::BRICK_SIZE, 0));
 	}
@@ -41,7 +42,7 @@ void Tetromino::moveLeft()
 void Tetromino::moveDown()
 {
 	position.y += Brick::BRICK_SIZE;
-	for (std::shared_ptr<Brick> brick : bricksList)
+	for (shared_ptr<Brick> brick : bricksList)
 	{
 		brick->move(sf::Vector2i(0, Brick::BRICK_SIZE));
 	}
@@ -49,22 +50,100 @@ void Tetromino::moveDown()
 
 void Tetromino::drop(int rowsCount)
 {
-	position.y += Brick::BRICK_SIZE * rowsCount;
-	for (std::shared_ptr<Brick> brick : bricksList)
+	for (shared_ptr<Brick> brick : bricksList)
 	{
 		brick->move(sf::Vector2i(0, Brick::BRICK_SIZE * rowsCount));
 	}
 }
 
-bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType & moveType)
+int Tetromino::getDropCount(TetrisShape & tetrisShape, int boardWidth)
 {
+	list<shared_ptr<Brick>> otherBricksList = tetrisShape.getBricksList();
+	
+	list<sf::Vector2i> brickPositions;
+	for (shared_ptr<Brick> brick : bricksList)
+	{
+		brickPositions.push_back(brick->getPosition());
+	}
+	
+	int dropCounter;
+	for (dropCounter = 0; dropCounter < 20; dropCounter++)
+	{
+		list<sf::Vector2i>::iterator it;
+
+		for (it = brickPositions.begin(); it != brickPositions.end(); ++it)
+		{
+			it->y += Brick::BRICK_SIZE;
+			if (checkColision(*it, boardWidth, otherBricksList))
+			{
+				return dropCounter;
+			}
+		}
+	}
+
+	return dropCounter;
+}
+
+bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType moveType, int boardWidth)
+{
+	sf::Vector2i moveVector;
+	list<shared_ptr<Brick>> otherBricksList = tetrisShape.getBricksList();
+	switch (moveType)
+	{
+	case DOWN:
+		moveVector = sf::Vector2i(0, Brick::BRICK_SIZE);
+		break;
+	case LEFT:
+		moveVector = sf::Vector2i(-Brick::BRICK_SIZE, 0);
+		break;
+	case RIGHT:
+		moveVector = sf::Vector2i(Brick::BRICK_SIZE, 0);
+		break;
+	}
+
+	for (shared_ptr<Brick> brick : bricksList)
+	{
+		sf::Vector2i currentBrickPosition = brick->getPosition();
+		if (moveType == ROTATE)
+		{
+			int newX = position.x + position.y - brick->getPosition().y - Brick::BRICK_SIZE;
+			int newY = brick->getPosition().x + position.y - position.x;
+			currentBrickPosition = sf::Vector2i(newX, newY);
+		}
+		else
+		{
+			currentBrickPosition.x += moveVector.x;
+			currentBrickPosition.y += moveVector.y;
+		}
+		if (checkColision(currentBrickPosition, boardWidth, otherBricksList))
+		{
+			return true;
+		}
+	}
 	return false;
 }
 
-std::list<sf::RectangleShape> Tetromino::getDrawableItems()
+bool Tetromino::checkColision(sf::Vector2i currentBrickPosition, int boardWidth, list<shared_ptr<Brick>> otherBricksList)
 {
-	std::list<sf::RectangleShape> drawableItems;
-	for (std::shared_ptr<Brick> brick : bricksList)
+	if (currentBrickPosition.x < 0 || currentBrickPosition.x >= boardWidth || currentBrickPosition.y >= 400) // TODO: wysokosc planszy powinna byc stala, nie zahardcodowana
+	{
+		return true;
+	}
+	for (shared_ptr<Brick> otherBrick : otherBricksList)
+	{
+		sf::Vector2i otherBrickPosition = otherBrick->getPosition();
+		if (currentBrickPosition.x == otherBrickPosition.x && currentBrickPosition.y == otherBrickPosition.y)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+list<sf::RectangleShape> Tetromino::getDrawableItems()
+{
+	list<sf::RectangleShape> drawableItems;
+	for (shared_ptr<Brick> brick : bricksList)
 	{
 		drawableItems.push_back(brick->getDrawable());
 	}
@@ -73,5 +152,27 @@ std::list<sf::RectangleShape> Tetromino::getDrawableItems()
 
 void Tetromino::clearLine(int lineNumber)
 {
+	list<shared_ptr<Brick>>::iterator it = bricksList.begin();
+	while (it != bricksList.end())
+	{
+		int brickPositionY = (*it)->getPosition().y;
+		int clearedLine = lineNumber * Brick::BRICK_SIZE;
+		if (brickPositionY == clearedLine)
+		{
+			it = bricksList.erase(it);
+		}
+		else 
+		{
+			if (brickPositionY < clearedLine)
+			{
+				(*it)->move(sf::Vector2i(0, Brick::BRICK_SIZE));
+			}
+			it++;
+		}
+	}
+}
 
+list<shared_ptr<Brick>> Tetromino::getBricksList()
+{
+	return bricksList;
 }
