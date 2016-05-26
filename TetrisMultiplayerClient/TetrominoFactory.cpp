@@ -18,38 +18,39 @@ TetrominoFactory::~TetrominoFactory()
 {
 }
 
-Tetromino * TetrominoFactory::getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType & tetrominoType)
+Tetromino TetrominoFactory::getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType tetrominoType)
 {
 	switch (tetrominoType)
 	{
+	default:
 	case TetrominoTypeI:
-		return new TetrominoI(position, color);
+		return TetrominoI(position, color);
 	case TetrominoTypeJ:
-		return new TetrominoJ(position, color);
+		return TetrominoJ(position, color);
 	case TetrominoTypeL:
-		return new TetrominoL(position, color);
+		return TetrominoL(position, color);
 	case TetrominoTypeO:
-		return new TetrominoO(position, color);
+		return TetrominoO(position, color);
 	case TetrominoTypeS:
-		return new TetrominoS(position, color);
+		return TetrominoS(position, color);
 	case TetrominoTypeT:
-		return new TetrominoT(position, color);
+		return TetrominoT(position, color);
 	case TetrominoTypeZ:
-		return new TetrominoZ(position, color);
+		return TetrominoZ(position, color);
 	}
 }
 
-Tetromino * TetrominoFactory::getTetromino(sf::Vector2i & position, const TetrominoType & tetrominoType)
+Tetromino TetrominoFactory::getTetromino(sf::Vector2i & position, const TetrominoType tetrominoType)
 {
 	return getTetromino(position, getRandomColor(), tetrominoType);
 }
 
-Tetromino * TetrominoFactory::getRandomTetromino(sf::Vector2i & position, const sf::Color * color)
+Tetromino TetrominoFactory::getRandomTetromino(sf::Vector2i & position, const sf::Color * color)
 {
 	return getTetromino(position, color, getRandomTetrominoType());
 }
 
-Tetromino * TetrominoFactory::getRandomTetromino(sf::Vector2i & position)
+Tetromino TetrominoFactory::getRandomTetromino(sf::Vector2i & position)
 {
 	return getRandomTetromino(position, getRandomColor());
 }
@@ -58,6 +59,7 @@ const sf::Color * TetrominoFactory::getRandomColor()
 {
 	switch (distribution(randomGenerator))
 	{
+	default:
 	case 0:
 		return &sf::Color::Blue;
 	case 1:
@@ -75,10 +77,11 @@ const sf::Color * TetrominoFactory::getRandomColor()
 	}
 }
 
-const TetrominoType & TetrominoFactory::getRandomTetrominoType()
+const TetrominoType TetrominoFactory::getRandomTetrominoType()
 {
 	switch (distribution(randomGenerator))
 	{
+	default:
 	case 0:
 		return TetrominoTypeI;
 	case 1:

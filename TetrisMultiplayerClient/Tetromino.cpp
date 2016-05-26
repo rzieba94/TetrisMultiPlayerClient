@@ -10,29 +10,50 @@ Tetromino::~Tetromino()
 {
 }
 
-bool Tetromino::rotate()
+void Tetromino::rotate()
 {
-	return false;
+	for (std::shared_ptr<Brick> brick : bricksList)
+	{
+		int newX = position.x + position.y - brick->getPosition().y - Brick::BRICK_SIZE;
+		int newY = brick->getPosition().x + position.y - position.x;
+		brick->setPosition(sf::Vector2i(newX, newY));
+	}
 }
 
-bool Tetromino::moveRight()
+void Tetromino::moveRight()
 {
-	return false;
+	position.x += Brick::BRICK_SIZE;
+	for (std::shared_ptr<Brick> brick : bricksList)
+	{
+		brick->move(sf::Vector2i(Brick::BRICK_SIZE, 0));
+	}
 }
 
-bool Tetromino::moveLeft()
+void Tetromino::moveLeft()
 {
-	return false;
+	position.x -= Brick::BRICK_SIZE;
+	for (std::shared_ptr<Brick> brick : bricksList)
+	{
+		brick->move(sf::Vector2i(-Brick::BRICK_SIZE, 0));
+	}
 }
 
-bool Tetromino::moveDown() 
+void Tetromino::moveDown()
 {
-	return false;
+	position.y += Brick::BRICK_SIZE;
+	for (std::shared_ptr<Brick> brick : bricksList)
+	{
+		brick->move(sf::Vector2i(0, Brick::BRICK_SIZE));
+	}
 }
 
-bool Tetromino::drop(int rowsCount)
+void Tetromino::drop(int rowsCount)
 {
-	return false;
+	position.y += Brick::BRICK_SIZE * rowsCount;
+	for (std::shared_ptr<Brick> brick : bricksList)
+	{
+		brick->move(sf::Vector2i(0, Brick::BRICK_SIZE * rowsCount));
+	}
 }
 
 bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType & moveType)
@@ -40,8 +61,14 @@ bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType & moveType)
 	return false;
 }
 
-void Tetromino::getDrawableItems()
+std::list<sf::RectangleShape> Tetromino::getDrawableItems()
 {
+	std::list<sf::RectangleShape> drawableItems;
+	for (std::shared_ptr<Brick> brick : bricksList)
+	{
+		drawableItems.push_back(brick->getDrawable());
+	}
+	return drawableItems;
 }
 
 void Tetromino::clearLine(int lineNumber)
