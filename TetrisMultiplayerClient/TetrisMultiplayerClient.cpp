@@ -6,12 +6,22 @@
 #include <iostream>
 #include "TetrominoI.h"
 #include "TetrominoFactory.h"
+#include "SingleGame.h"
 
 using namespace std;
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(200, 400), "SFML works!");
+	Player player("Player", 1);
+	ParentGameEngine *singleGame = new SingleGame(player);
+
+	singleGame->startThread();
+	while (true)
+	{
+
+	}
+
+	/*sf::RenderWindow window(sf::VideoMode(200, 400), "SFML works!");
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 	sf::RectangleShape rectangle;
@@ -97,7 +107,7 @@ int main()
 			window.draw(rectangle);
 		}
 		window.display();
-	}
+	}*/
 
 	return 0;
 }

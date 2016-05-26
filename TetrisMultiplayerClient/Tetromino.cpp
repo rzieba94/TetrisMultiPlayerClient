@@ -86,8 +86,10 @@ int Tetromino::getDropCount(TetrisShape & tetrisShape, int boardWidth)
 
 bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType moveType, int boardWidth)
 {
+	cout << "w check colision1";
 	sf::Vector2i moveVector;
 	list<shared_ptr<Brick>> otherBricksList = tetrisShape.getBricksList();
+	cout << "w check colision2";
 	switch (moveType)
 	{
 	case DOWN:
@@ -100,7 +102,7 @@ bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType moveType, int 
 		moveVector = sf::Vector2i(Brick::BRICK_SIZE, 0);
 		break;
 	}
-
+	cout << "w check colision3";
 	for (shared_ptr<Brick> brick : bricksList)
 	{
 		sf::Vector2i currentBrickPosition = brick->getPosition();
@@ -115,6 +117,7 @@ bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType moveType, int 
 			currentBrickPosition.x += moveVector.x;
 			currentBrickPosition.y += moveVector.y;
 		}
+		cout << "w check colision4";
 		if (checkColision(currentBrickPosition, boardWidth, otherBricksList))
 		{
 			return true;
