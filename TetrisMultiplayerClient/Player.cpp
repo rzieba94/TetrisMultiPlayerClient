@@ -4,6 +4,7 @@
 
 Player::Player(string nick, int startPosition) : nick(nick)
 {
+	this->activeTetromino = 0;
 	this->startPosition = sf::Vector2i(startPosition * 5 * Brick::BRICK_SIZE, 20);
 	this->score = 0;
 }
@@ -28,12 +29,12 @@ const string Player::getNick()
 	return nick;
 }
 
-void Player::setActiveTetromino(shared_ptr<Tetromino> activeTetromino)
+void Player::setActiveTetromino(Tetromino * activeTetromino)
 {
 	this->activeTetromino = activeTetromino;
 }
 
-shared_ptr<Tetromino> Player::getActiveTetromino()
+Tetromino * Player::getActiveTetromino()
 {
 	return activeTetromino;
 }

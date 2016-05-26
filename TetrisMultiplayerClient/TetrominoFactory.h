@@ -18,10 +18,10 @@ class TetrominoFactory
 public:
 	TetrominoFactory();
 	~TetrominoFactory();
-	shared_ptr<Tetromino> getRandomTetromino(sf::Vector2i & position);
-	shared_ptr<Tetromino> getRandomTetromino(sf::Vector2i & position, const sf::Color * color);
-	shared_ptr<Tetromino> getTetromino(sf::Vector2i & position, const TetrominoType tetrominoType);
-	shared_ptr<Tetromino> getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType tetrominoType);
+	Tetromino getRandomTetromino(sf::Vector2i & position);
+	Tetromino getRandomTetromino(sf::Vector2i & position, const sf::Color * color);
+	Tetromino getTetromino(sf::Vector2i & position, const TetrominoType tetrominoType);
+	Tetromino getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType tetrominoType);
 private:
 	const sf::Color * getRandomColor();
 	const TetrominoType getRandomTetrominoType();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SingleGame.h"
-#include <iostream>
 #include <thread>
+
 
 using namespace std;
 
@@ -22,26 +22,24 @@ void SingleGame::run()
 	{
 		checkPlayersMove(*window);
 		notActiveTetrominos.clearLine(getLineToClear());
-		cout << "tutaj1";
 		if (checkForInactiveBlock())
 		{
-			cout << "tutaj3";
 			if (!placeNewTetromino())
 			{
 				return;
 			}
 		}
-		cout << "tutaj2";
 		displayInWindow(*window);
 		checkFrameTime();
+		this_thread::sleep_for(chrono::milliseconds(500));
 	}
 }
 
 void SingleGame::displayInWindow(sf::RenderWindow & window)
 {
 	window.clear();
-	shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
-	for (sf::RectangleShape rectangle : activeTetromino->getDrawableItems())
+	Tetromino activeTetromino = *player.getActiveTetromino();
+	for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
 	{
 		window.draw(rectangle);
 	}
@@ -63,38 +61,39 @@ void SingleGame::checkPlayersMove(sf::RenderWindow & window)
 		}
 		else if (event.type == sf::Event::KeyPressed)
 		{
+			Tetromino activeTetromino = *player.getActiveTetromino();
 			if (event.key.code == sf::Keyboard::Right)
 			{
-				if (!player.getActiveTetromino()->checkColision(notActiveTetrominos, RIGHT, 200))
+				if (!activeTetromino.checkColision(notActiveTetrominos, RIGHT, 200))
 				{
-					player.getActiveTetromino()->moveRight();
+					activeTetromino.moveRight();
 				}
 			}
 			else if (event.key.code == sf::Keyboard::Left)
 			{
-				if (!player.getActiveTetromino()->checkColision(notActiveTetrominos, LEFT, 200))
+				if (!activeTetromino.checkColision(notActiveTetrominos, LEFT, 200))
 				{
-					player.getActiveTetromino()->moveLeft();
+					activeTetromino.moveLeft();
 				}
 			}
 			else if (event.key.code == sf::Keyboard::Down)
 			{
-				if (!player.getActiveTetromino()->checkColision(notActiveTetrominos, DOWN, 200))
+				if (!activeTetromino.checkColision(notActiveTetrominos, DOWN, 200))
 				{
-					player.getActiveTetromino()->moveDown();
+					activeTetromino.moveDown();
 				}
 			}
 			else if (event.key.code == sf::Keyboard::Up)
 			{
-				if (!player.getActiveTetromino()->checkColision(notActiveTetrominos, ROTATE, 200))
+				if (!activeTetromino.checkColision(notActiveTetrominos, ROTATE, 200))
 				{
-					player.getActiveTetromino()->rotate();
+					activeTetromino.rotate();
 				}
 			}
 			else if (event.key.code == sf::Keyboard::Space)
 			{
-				int dropAmount = player.getActiveTetromino()->getDropCount(notActiveTetrominos, 200);
-				player.getActiveTetromino()->drop(dropAmount);
+				int dropAmount = activeTetromino.getDropCount(notActiveTetrominos, 200);
+				activeTetromino.drop(dropAmount);
 			}
 		}
 	}
@@ -102,10 +101,10 @@ void SingleGame::checkPlayersMove(sf::RenderWindow & window)
 
 bool SingleGame::placeNewTetromino()
 {
-	shared_ptr<Tetromino> newTetromino = tetrominoFactory.getRandomTetromino(player.getStartPosition());
-	if (newTetromino->checkColision(notActiveTetrominos, DOWN, 200))
+	Tetromino newTetromino = tetrominoFactory.getRandomTetromino(player.getStartPosition());
+	if (!newTetromino.checkColision(notActiveTetrominos, DOWN, 200))
 	{
-		player.setActiveTetromino(newTetromino);
+		player.setActiveTetromino(&newTetromino);
 		return true;
 	}
 	else
@@ -118,28 +117,35 @@ int SingleGame::getLineToClear()
 {
 	int previousLine = 0, currentLine = 0, brickCounter = 0 ;
 
-	for (std::shared_ptr<Brick> brick : notActiveTetrominos.getBricksList())
+	list<shared_ptr<Brick>> bricksList = notActiveTetrominos.getBricksList();
+	if (!bricksList.empty())
 	{
-		sf::Vector2i brickPosition = brick->getPosition();
-		currentLine = brickPosition.y;
-		if (currentLine == previousLine)
+		for (shared_ptr<Brick> brick : notActiveTetrominos.getBricksList())
 		{
-			brickCounter++;
+			sf::Vector2i brickPosition = brick->getPosition();
+			currentLine = brickPosition.y;
+			if (currentLine == previousLine)
+			{
+				brickCounter++;
+			}
+			else
+			{
+				brickCounter = 0;
+			}
+			if (brickCounter == 9)
+			{
+				return currentLine;
+			}
+			previousLine = currentLine;
 		}
-		if (brickCounter == 9)
-		{
-			return currentLine;
-		}
-		previousLine = currentLine;
 	}
+	return -1;
 }
 
 bool SingleGame::checkForInactiveBlock()
 {
-	cout << "w checku1";
-	shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
-	cout << "w checku2";
-	return activeTetromino->checkColision(notActiveTetrominos, DOWN, 200);
+	Tetromino activeTetromino = *player.getActiveTetromino();
+	return activeTetromino.checkColision(notActiveTetrominos, DOWN, 200);
 }
 
 void SingleGame::moveDownAllActiveBlocks()

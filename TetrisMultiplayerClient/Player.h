@@ -13,13 +13,13 @@ public:
 	void addScore(int score);
 	const int getScore();
 	const string getNick();
-	void setActiveTetromino(shared_ptr<Tetromino> activeTetromino);
-	shared_ptr<Tetromino> getActiveTetromino();
+	void setActiveTetromino(Tetromino * activeTetromino);
+	Tetromino * getActiveTetromino();
 	sf::Vector2i getStartPosition();
 private:
 	string nick;
 	int score;
-	shared_ptr<Tetromino> activeTetromino;
+	Tetromino * activeTetromino;
 	sf::Vector2i startPosition;
 };
 

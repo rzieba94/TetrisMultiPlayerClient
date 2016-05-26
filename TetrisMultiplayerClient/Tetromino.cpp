@@ -105,7 +105,9 @@ bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType moveType, int 
 	cout << "w check colision3";
 	for (shared_ptr<Brick> brick : bricksList)
 	{
+		cout << "w check colision4";
 		sf::Vector2i currentBrickPosition = brick->getPosition();
+		cout << "w check colision5";
 		if (moveType == ROTATE)
 		{
 			int newX = position.x + position.y - brick->getPosition().y - Brick::BRICK_SIZE;
@@ -117,7 +119,7 @@ bool Tetromino::checkColision(TetrisShape & tetrisShape, MoveType moveType, int 
 			currentBrickPosition.x += moveVector.x;
 			currentBrickPosition.y += moveVector.y;
 		}
-		cout << "w check colision4";
+		cout << "w check colision6";
 		if (checkColision(currentBrickPosition, boardWidth, otherBricksList))
 		{
 			return true;
@@ -132,12 +134,15 @@ bool Tetromino::checkColision(sf::Vector2i currentBrickPosition, int boardWidth,
 	{
 		return true;
 	}
-	for (shared_ptr<Brick> otherBrick : otherBricksList)
+	if (!otherBricksList.empty())
 	{
-		sf::Vector2i otherBrickPosition = otherBrick->getPosition();
-		if (currentBrickPosition.x == otherBrickPosition.x && currentBrickPosition.y == otherBrickPosition.y)
+		for (shared_ptr<Brick> otherBrick : otherBricksList)
 		{
-			return true;
+			sf::Vector2i otherBrickPosition = otherBrick->getPosition();
+			if (currentBrickPosition.x == otherBrickPosition.x && currentBrickPosition.y == otherBrickPosition.y)
+			{
+				return true;
+			}
 		}
 	}
 	return false;
@@ -155,22 +160,25 @@ list<sf::RectangleShape> Tetromino::getDrawableItems()
 
 void Tetromino::clearLine(int lineNumber)
 {
-	list<shared_ptr<Brick>>::iterator it = bricksList.begin();
-	while (it != bricksList.end())
+	if (lineNumber != -1)
 	{
-		int brickPositionY = (*it)->getPosition().y;
-		int clearedLine = lineNumber * Brick::BRICK_SIZE;
-		if (brickPositionY == clearedLine)
+		list<shared_ptr<Brick>>::iterator it = bricksList.begin();
+		while (it != bricksList.end())
 		{
-			it = bricksList.erase(it);
-		}
-		else 
-		{
-			if (brickPositionY < clearedLine)
+			int brickPositionY = (*it)->getPosition().y;
+			int clearedLine = lineNumber * Brick::BRICK_SIZE;
+			if (brickPositionY == clearedLine)
 			{
-				(*it)->move(sf::Vector2i(0, Brick::BRICK_SIZE));
+				it = bricksList.erase(it);
 			}
-			it++;
+			else
+			{
+				if (brickPositionY < clearedLine)
+				{
+					(*it)->move(sf::Vector2i(0, Brick::BRICK_SIZE));
+				}
+				it++;
+			}
 		}
 	}
 }
