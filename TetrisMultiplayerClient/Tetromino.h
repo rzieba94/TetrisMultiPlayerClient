@@ -5,8 +5,6 @@
 #include <memory>
 #include <SFML/Graphics/Color.hpp>
 
-using namespace std;
-
 class Tetromino : public TetrisShape
 {
 public:
@@ -21,6 +19,7 @@ public:
 	list<sf::RectangleShape> getDrawableItems();
 	void clearLine(int lineNumber);
 	list<shared_ptr<Brick>> getBricksList();
+	bool isEmptyBricksList();
 protected:
 	Tetromino(sf::Vector2i & position, const sf::Color * color);
 	const sf::Color * color;

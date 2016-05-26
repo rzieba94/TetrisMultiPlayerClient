@@ -20,9 +20,9 @@ int main()
 
 	TetrominoFactory tetrominoFactory = TetrominoFactory();
 	Tetromino tetromino = tetrominoFactory.getRandomTetromino(vector);
-	TetrisShape *tet = &tetromino;
+	Tetromino *tet = &tetromino;
 	Tetromino tetromino2 = tetrominoFactory.getRandomTetromino(vector2);
-	TetrisShape *tet2 = &tetromino2;
+	Tetromino *tet2 = &tetromino2;
 
 	while (window.isOpen())
 	{
@@ -74,7 +74,6 @@ int main()
 				{
 					std::cout << "drop";
 					int dropAmount = tet->getDropCount(*tet2, 200);
-					cout << "drop amount: " << dropAmount;
 					tet->drop(dropAmount);
 				}
 				else if (event.key.code == sf::Keyboard::C)

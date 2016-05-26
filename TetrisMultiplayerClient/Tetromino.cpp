@@ -176,3 +176,8 @@ list<shared_ptr<Brick>> Tetromino::getBricksList()
 {
 	return bricksList;
 }
+
+bool Tetromino::isEmptyBricksList()
+{
+	return getBricksList().empty();
+}
