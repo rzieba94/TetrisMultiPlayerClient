@@ -10,39 +10,39 @@ TetrominoFactory::~TetrominoFactory()
 {
 }
 
-Tetromino TetrominoFactory::getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType tetrominoType)
+shared_ptr<Tetromino> TetrominoFactory::getTetromino(sf::Vector2i & position, const sf::Color * color, const TetrominoType tetrominoType)
 {
 	switch (tetrominoType)
 	{
 	default:
 	case TetrominoTypeI:
-		return TetrominoI(position, color);
+		return shared_ptr<Tetromino>(new TetrominoI(position, color));
 	case TetrominoTypeJ:
-		return TetrominoJ(position, color);
+		return shared_ptr<Tetromino>(new TetrominoJ(position, color));
 	case TetrominoTypeL:
-		return TetrominoL(position, color);
+		return shared_ptr<Tetromino>(new TetrominoL(position, color));
 	case TetrominoTypeO:
-		return TetrominoO(position, color);
+		return shared_ptr<Tetromino> (new TetrominoO(position, color));
 	case TetrominoTypeS:
-		return TetrominoS(position, color);
+		return shared_ptr<Tetromino>(new TetrominoS(position, color));
 	case TetrominoTypeT:
-		return TetrominoT(position, color);
+		return shared_ptr<Tetromino>(new TetrominoT(position, color));
 	case TetrominoTypeZ:
-		return TetrominoZ(position, color);
+		return shared_ptr<Tetromino>(new TetrominoZ(position, color));
 	}
 }
 
-Tetromino TetrominoFactory::getTetromino(sf::Vector2i & position, const TetrominoType tetrominoType)
+shared_ptr<Tetromino> TetrominoFactory::getTetromino(sf::Vector2i & position, const TetrominoType tetrominoType)
 {
 	return getTetromino(position, getRandomColor(), tetrominoType);
 }
 
-Tetromino TetrominoFactory::getRandomTetromino(sf::Vector2i & position, const sf::Color * color)
+shared_ptr<Tetromino> TetrominoFactory::getRandomTetromino(sf::Vector2i & position, const sf::Color * color)
 {
 	return getTetromino(position, color, getRandomTetrominoType());
 }
 
-Tetromino TetrominoFactory::getRandomTetromino(sf::Vector2i & position)
+shared_ptr<Tetromino> TetrominoFactory::getRandomTetromino(sf::Vector2i & position)
 {
 	return getRandomTetromino(position, getRandomColor());
 }

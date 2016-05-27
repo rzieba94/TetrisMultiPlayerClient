@@ -5,9 +5,8 @@
 
 using namespace std;
 
-SingleGame::SingleGame(Player player) : player(player)
+SingleGame::SingleGame(Player player) : player(player), window(sf::VideoMode(200, 400), "Tetris Multiplayer")
 {
-	this->window = new sf::RenderWindow(sf::VideoMode(200, 400), "Tetris Multiplayer");
 }
 
 
@@ -18,9 +17,9 @@ SingleGame::~SingleGame()
 void SingleGame::run()
 {
 	placeNewTetromino();
-	while (window->isOpen())
+	while (window.isOpen())
 	{
-		checkPlayersMove(*window);
+		checkPlayersMove(window);
 		notActiveTetrominos.clearLine(getLineToClear());
 		if (checkForInactiveBlock())
 		{
@@ -29,13 +28,13 @@ void SingleGame::run()
 				return;
 			}
 		}
-		displayInWindow(*window);
+		displayInWindow(window);
 		checkFrameTime();
 		this_thread::sleep_for(chrono::milliseconds(500));
 	}
 }
 
-void SingleGame::displayInWindow(sf::RenderWindow & window)
+void SingleGame::displayInWindow(sf::RenderWindow window)
 {
 	window.clear();
 	Tetromino activeTetromino = *player.getActiveTetromino();
@@ -50,7 +49,7 @@ void SingleGame::displayInWindow(sf::RenderWindow & window)
 	window.display();
 }
 
-void SingleGame::checkPlayersMove(sf::RenderWindow & window)
+void SingleGame::checkPlayersMove(sf::RenderWindow window)
 {
 	sf::Event event;
 	while (window.pollEvent(event))
@@ -101,10 +100,10 @@ void SingleGame::checkPlayersMove(sf::RenderWindow & window)
 
 bool SingleGame::placeNewTetromino()
 {
-	Tetromino newTetromino = tetrominoFactory.getRandomTetromino(player.getStartPosition());
-	if (!newTetromino.checkColision(notActiveTetrominos, DOWN, 200))
+	shared_ptr<Tetromino> newTetromino = tetrominoFactory.getRandomTetromino(player.getStartPosition());
+	if (!newTetromino->checkColision(notActiveTetrominos, DOWN, 200))
 	{
-		player.setActiveTetromino(&newTetromino);
+		player.setActiveTetromino(newTetromino);
 		return true;
 	}
 	else

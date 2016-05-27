@@ -29,12 +29,12 @@ const string Player::getNick()
 	return nick;
 }
 
-void Player::setActiveTetromino(Tetromino * activeTetromino)
+void Player::setActiveTetromino(shared_ptr<Tetromino> activeTetromino)
 {
 	this->activeTetromino = activeTetromino;
 }
 
-Tetromino * Player::getActiveTetromino()
+shared_ptr<Tetromino> Player::getActiveTetromino()
 {
 	return activeTetromino;
 }
