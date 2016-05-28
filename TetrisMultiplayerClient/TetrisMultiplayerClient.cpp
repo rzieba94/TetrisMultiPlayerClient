@@ -18,7 +18,7 @@ int main()
 	singleGame->startThread();
 	while (true)
 	{
-
+		this_thread::sleep_for(chrono::milliseconds(100000));
 	}
 
 	/*sf::RenderWindow window(sf::VideoMode(200, 400), "SFML works!");

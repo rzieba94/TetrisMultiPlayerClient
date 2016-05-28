@@ -5,7 +5,7 @@
 Player::Player(string nick, int startPosition) : nick(nick)
 {
 	this->activeTetromino = 0;
-	this->startPosition = sf::Vector2i(startPosition * 5 * Brick::BRICK_SIZE, 20);
+	this->startPosition = sf::Vector2i(startPosition * 5 * Brick::BRICK_SIZE, 40);
 	this->score = 0;
 }
 

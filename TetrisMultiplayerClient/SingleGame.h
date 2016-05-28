@@ -11,13 +11,12 @@ public:
 	~SingleGame();
 private:
 	void run();
-	void displayInWindow(sf::RenderWindow window);
+	void displayInWindow(sf::RenderWindow & window);
 	void moveDownAllActiveBlocks();
 	bool placeNewTetromino();
 	int getLineToClear();
 	bool checkForInactiveBlock();
-	void checkPlayersMove(sf::RenderWindow window);
+	void checkPlayersMove(sf::RenderWindow & window);
 	Player player;
-	sf::RenderWindow window;
 };
 

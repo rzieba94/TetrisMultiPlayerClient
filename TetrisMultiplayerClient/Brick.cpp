@@ -32,7 +32,7 @@ sf::RectangleShape Brick::getDrawable()
 	return rectangle;
 }
 
-sf::Vector2i Brick::getPosition()
+const sf::Vector2i Brick::getPosition()const
 {
 	return position;
 }

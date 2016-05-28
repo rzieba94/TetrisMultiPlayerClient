@@ -10,7 +10,7 @@ public:
 	~Brick();
 	void move(sf::Vector2i & moveVector);
 	void setPosition(sf::Vector2i & newPosition);
-	sf::Vector2i getPosition();
+	const sf::Vector2i getPosition()const;
 	sf::RectangleShape getDrawable();
 	static const int BRICK_SIZE = 20;
 private: 
