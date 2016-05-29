@@ -15,14 +15,33 @@ struct ConnectionStatusMsg
 
 struct MoveMsg
 {
-	string cmd;
-	string moveType;
-	string userId;
-	int dropCount;
+	string cmd; //move
+	string moveType; //down, left, right, drop
+	string userId; // nick
+	int dropCount; // 0 lub wartosc
 };
 
 struct StartGame
 {
-	string cmd;
-	string gameType;
+	string cmd; // startGame
+	string gameType; // single, cooperation
+};
+
+struct ClearLine
+{
+	string cmd; //clearLine
+	int lineNumber; //numerLinii
+};
+
+struct PlaceTetromino
+{
+	string cmd; // placeTetromino
+	string tetrominoType; //typ tetromino
+	int positionX;
+	int positionY;
+};
+
+struct EndGame
+{
+	string cmd; // endGame
 };
