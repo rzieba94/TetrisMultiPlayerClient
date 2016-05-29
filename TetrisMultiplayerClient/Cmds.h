@@ -13,5 +13,6 @@ enum Cmds
 	endGame,
 	endServer,
 	timeout, 
-	getGamesList
+	getGamesList,
+	waiting
 };
