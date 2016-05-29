@@ -14,7 +14,6 @@ public:
 	void startThread();
 protected:
 	virtual void run() = 0;
-	void checkFrameTime();
 	virtual void moveDownAllActiveBlocks() = 0;
 	virtual void displayInWindow(sf::RenderWindow & window) = 0;
 

@@ -32,7 +32,7 @@ void SingleGame::run()
 		
 		displayInWindow(window);
 
-		checkFrameTime();
+
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
 }

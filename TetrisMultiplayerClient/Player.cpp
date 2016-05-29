@@ -2,13 +2,11 @@
 #include "Player.h"
 
 
-Player::Player(string nick, int startPosition) : nick(nick)
+Player::Player(string nick) : nick(nick)
 {
 	this->activeTetromino = 0;
-	this->startPosition = sf::Vector2i(startPosition * 5 * Brick::BRICK_SIZE, 40);
 	this->score = 0;
 }
-
 
 Player::~Player()
 {
@@ -42,4 +40,9 @@ shared_ptr<Tetromino> Player::getActiveTetromino()
 sf::Vector2i Player::getStartPosition()
 {
 	return startPosition;
+}
+
+void Player::getStartPosition(int startPosition)
+{
+	this->startPosition = sf::Vector2i(startPosition * 5 * Brick::BRICK_SIZE, 40);
 }
