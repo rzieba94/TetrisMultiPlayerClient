@@ -2,7 +2,7 @@
 #include "ServerListenerThread.h"
 
 
-ServerListenerThread::ServerListenerThread()
+ServerListenerThread::ServerListenerThread(shared_ptr<LocalPlayer> localPlayer) : localPlayer(localPlayer)
 {
 }
 

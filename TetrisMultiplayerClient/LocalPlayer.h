@@ -6,7 +6,7 @@
 class LocalPlayer : public Player
 {
 public:
-	LocalPlayer(string nick);
+	LocalPlayer(string nick, shared_ptr<sf::TcpSocket> socket);
 	~LocalPlayer();
 	void send(sf::Packet packet);
 	sf::Packet receive();

@@ -2,7 +2,7 @@
 #include "LocalPlayer.h"
 
 
-LocalPlayer::LocalPlayer(string nick) : Player(nick)
+LocalPlayer::LocalPlayer(string nick, shared_ptr<sf::TcpSocket> socket) : Player(nick), socket(socket)
 {
 }
 
