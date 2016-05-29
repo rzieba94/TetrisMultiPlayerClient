@@ -7,12 +7,44 @@
 #include "TetrominoI.h"
 #include "TetrominoFactory.h"
 #include "SingleGame.h"
+#include <string>
+#include "SFML\Network.hpp"
 
 using namespace std;
 
 int main()
 {
-	Player player("Player", 1);
+	string serverIp, nick;
+	int serverPort;
+
+	cout << "TETRIS MULTIPLAYER SERVER" << endl << endl;
+	cout << "Autorzy: " << endl;
+	cout << "Marcin Muskala" << endl;
+	cout << "Marek Nawrot" << endl;
+	cout << "Michal Sliwa" << endl;
+	cout << "Rafal Zieba" << endl << endl;
+
+	cout << "Podaj numer ip serwera: ";
+	cin >> serverIp;
+	cout << "Podaj numer portu dla serwera: ";
+	cin >> serverPort;
+	cout << "Podaj swoj nick: ";
+	cin >> nick;
+
+	sf::TcpSocket socket;
+	sf::Socket::Status status = socket.connect(serverIp, serverPort);
+	if (status != sf::Socket::Done)
+	{
+		cout << "Podczas laczenia z serwerem wystapil blad.";
+	}
+
+	sf::Packet packet;
+	string cmd = "connect";
+	packet << cmd << nick;
+	socket.send(packet);
+
+	/*
+		Player player("Player", 1);
 	ParentGameEngine *singleGame = new SingleGame(player);
 
 	singleGame->startThread();
@@ -21,7 +53,7 @@ int main()
 		this_thread::sleep_for(chrono::milliseconds(100000));
 	}
 
-	/*sf::RenderWindow window(sf::VideoMode(200, 400), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(200, 400), "SFML works!");
 	sf::CircleShape shape(100.f);
 	shape.setFillColor(sf::Color::Green);
 	sf::RectangleShape rectangle;
