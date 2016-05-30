@@ -6,18 +6,16 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "SingleGame.h"
 #include "StringSplitter.h"
 
 
-ServerListenerThread::ServerListenerThread(shared_ptr<LocalPlayer> localPlayer) : localPlayer(localPlayer), isRunning(true)
-{
 
+ServerListenerThread::ServerListenerThread(shared_ptr<LocalPlayer> localPlayer) : localPlayer(localPlayer), isRunning(true), gameStarted(false)
+{
 }
 
 ServerListenerThread::~ServerListenerThread()
 {
-
 }
 
 void ServerListenerThread::launchListeners()
@@ -42,23 +40,35 @@ void ServerListenerThread::runServerListener()
 		{
 		case Cmds::startGame:
 		{
+			singleGame = new SingleGame(*localPlayer);
+			gameStarted = true;
 			StartGame msg;
 			incomingPacket >> msg.gameType >> msg.playersNumber >> msg.userIds;
 			cout << msg.gameType << msg.playersNumber << msg.userIds;
 			if (msg.gameType == GameType::single)
 			{
-				
-				std::vector<std::string> playerNames = StringSplitter::split(msg.userIds, ';');
-				Player singleGamePlayer(playerNames[0]);
-				SingleGame game(singleGamePlayer);
-				game.startThread();
+				singleplayer = true;
 			}
 			else
 			{
 				//multi
+				singleplayer = false;
 			}
 		}
 			break;
+		case Cmds::placeTetromino:
+		{
+			PlaceTetromino msg;
+			incomingPacket >> msg.tetrominoType >> msg.userId >> msg.positionX >> msg.positionY;
+			cout << "odebrany klocek" << endl;
+			if (singleplayer)
+			{
+				sf::Vector2i tetPos(msg.positionX, msg.positionY);
+				singleGame->placeNewTetromino(tetPos, (TetrominoType)msg.tetrominoType);
+			}
+		}
+			break;
+
 		case Cmds::endGame:
 			isRunning = false;
 			break;
@@ -98,9 +108,59 @@ void ServerListenerThread::runClientListener()
 	}
 	gameStartPacket << msg.cmd << msg.gameType << msg.playersNumber << msg.userIds;
 	localPlayer->send(gameStartPacket);
+
 	while (isRunning)
 	{
-		
+		if (gameStarted)
+		{
+			sf::RenderWindow *window = singleGame->getWindow();
+			sf::Event event;
+			while (window->pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+				{
+					window->close();
+				}
+				else if (event.type == sf::Event::KeyPressed)
+				{
+					shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
+					if (event.key.code == sf::Keyboard::Right)
+					{
+						if (!activeTetromino->checkColision(notActiveTetrominos, RIGHT, 200))
+						{
+							activeTetromino->moveRight();
+						}
+					}
+					else if (event.key.code == sf::Keyboard::Left)
+					{
+						if (!activeTetromino->checkColision(notActiveTetrominos, LEFT, 200))
+						{
+							activeTetromino->moveLeft();
+						}
+					}
+					else if (event.key.code == sf::Keyboard::Down)
+					{
+						if (!activeTetromino->checkColision(notActiveTetrominos, DOWN, 200))
+						{
+							activeTetromino->moveDown();
+						}
+					}
+					else if (event.key.code == sf::Keyboard::Up)
+					{
+						if (!activeTetromino->checkColision(notActiveTetrominos, ROTATE, 200))
+						{
+							activeTetromino->rotate();
+						}
+					}
+					else if (event.key.code == sf::Keyboard::Space)
+					{
+						int dropAmount = activeTetromino->getDropCount(notActiveTetrominos, 200);
+						activeTetromino->drop(dropAmount);
+					}
+				}
+			}
+		}
+
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 	}
 }

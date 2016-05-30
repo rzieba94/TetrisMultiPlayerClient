@@ -44,7 +44,7 @@ struct ClearLine
 struct PlaceTetromino
 {
 	int cmd; // placeTetromino
-	TetrominoType tetrominoType; //typ tetromino
+	int tetrominoType; //typ tetromino
 	string userId; // nick
 	int positionX;
 	int positionY;

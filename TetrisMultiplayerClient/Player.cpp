@@ -3,6 +3,10 @@
 #include <iostream>
 
 
+Player::Player()
+{
+}
+
 Player::Player(string nick) : nick(nick)
 {
 	this->activeTetromino = 0;
@@ -44,7 +48,7 @@ sf::Vector2i Player::getStartPosition()
 	return startPosition;
 }
 
-void Player::getStartPosition(int startPosition)
+void Player::setStartPosition(int startPosition)
 {
 	this->startPosition = sf::Vector2i(startPosition * 5 * Brick::BRICK_SIZE, 40);
 }

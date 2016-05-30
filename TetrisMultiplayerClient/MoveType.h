@@ -1,8 +1,8 @@
 #pragma once
 enum MoveType {
-	LEFT,
-	RIGHT,
-	DOWN,
-	DROP,
-	ROTATE
+	LEFT = 0,
+	RIGHT = 1,
+	DOWN = 2,
+	DROP = 3,
+	ROTATE = 4
 };

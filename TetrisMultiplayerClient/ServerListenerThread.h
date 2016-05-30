@@ -1,5 +1,6 @@
 #pragma once
-#include "LocalPlayer.h";
+#include "LocalPlayer.h"
+#include "SingleGame.h"
 #include <memory>
 
 class ServerListenerThread
@@ -10,8 +11,12 @@ public:
 	void launchListeners();
 private:
 	shared_ptr<LocalPlayer> localPlayer;
+	SingleGame *singleGame;
 	bool isRunning;
+	bool singleplayer;
+	bool gameStarted;
 	void runServerListener();
 	void runClientListener();
+
 };
 

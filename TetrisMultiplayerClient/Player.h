@@ -8,6 +8,7 @@ using namespace std;
 class Player
 {
 public:
+	Player();
 	Player(string nick);
 	~Player();
 	void addScore(int score);
@@ -16,7 +17,7 @@ public:
 	void setActiveTetromino(shared_ptr<Tetromino> activeTetromino);
 	shared_ptr<Tetromino> getActiveTetromino();
 	sf::Vector2i getStartPosition();
-	void getStartPosition(int startPosition);
+	void setStartPosition(int startPosition);
 private:
 	string nick;
 	int score;
