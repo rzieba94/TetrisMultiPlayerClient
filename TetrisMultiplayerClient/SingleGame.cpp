@@ -12,7 +12,7 @@ SingleGame::SingleGame()
 
 SingleGame::SingleGame(Player player) : player(player), firstBrick(true)
 {
-	window = sf::RenderWindow(sf::VideoMode(200, 400), "Tetris Multiplayer");
+	window = &sf::RenderWindow(sf::VideoMode(200, 400), "Tetris Multiplayer");
 }
 
 SingleGame::~SingleGame()

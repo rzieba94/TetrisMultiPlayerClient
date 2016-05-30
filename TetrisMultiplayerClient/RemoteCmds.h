@@ -19,7 +19,7 @@ struct ConnectionStatusMsg
 struct MoveMsg
 {
 	int cmd; //move
-	MoveType moveType; //down, left, right, drop
+	int moveType; //down, left, right, drop
 	string userId; // nick
 	int dropCount; // 0 lub wartosc
 };

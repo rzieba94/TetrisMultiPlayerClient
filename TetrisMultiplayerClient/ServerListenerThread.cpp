@@ -68,7 +68,30 @@ void ServerListenerThread::runServerListener()
 			}
 		}
 			break;
-
+		case Cmds::move:
+		{
+			MoveMsg msg;
+			incomingPacket >> msg.moveType >> msg.userId >> msg.dropCount;
+			switch (msg.moveType)
+			{
+			case MoveType::RIGHT:
+				localPlayer->getActiveTetromino()->moveRight();
+				break;
+			case MoveType::LEFT:
+				localPlayer->getActiveTetromino()->moveLeft();
+				break;
+			case MoveType::DOWN:
+				localPlayer->getActiveTetromino()->moveDown();
+				break;
+			case MoveType::ROTATE:
+				localPlayer->getActiveTetromino()->rotate();
+				break;
+			case MoveType::DROP:
+				localPlayer->getActiveTetromino()->drop(msg.dropCount);
+				break;
+			}
+		}
+			break;
 		case Cmds::endGame:
 			isRunning = false;
 			break;
@@ -113,6 +136,7 @@ void ServerListenerThread::runClientListener()
 	{
 		if (gameStarted)
 		{
+			//TODO: ZWRACA NULLA POPRAWIC
 			sf::RenderWindow *window = singleGame->getWindow();
 			sf::Event event;
 			while (window->pollEvent(event))
@@ -123,40 +147,34 @@ void ServerListenerThread::runClientListener()
 				}
 				else if (event.type == sf::Event::KeyPressed)
 				{
-					shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
+					MoveMsg msg;
+					msg.cmd = Cmds::move;
+					msg.userId = localPlayer->getNick();
+					msg.dropCount = 0;
 					if (event.key.code == sf::Keyboard::Right)
 					{
-						if (!activeTetromino->checkColision(notActiveTetrominos, RIGHT, 200))
-						{
-							activeTetromino->moveRight();
-						}
+						msg.moveType = MoveType::RIGHT;
 					}
 					else if (event.key.code == sf::Keyboard::Left)
 					{
-						if (!activeTetromino->checkColision(notActiveTetrominos, LEFT, 200))
-						{
-							activeTetromino->moveLeft();
-						}
+						msg.moveType = MoveType::LEFT;
 					}
 					else if (event.key.code == sf::Keyboard::Down)
 					{
-						if (!activeTetromino->checkColision(notActiveTetrominos, DOWN, 200))
-						{
-							activeTetromino->moveDown();
-						}
+						msg.moveType = MoveType::DOWN;
 					}
 					else if (event.key.code == sf::Keyboard::Up)
 					{
-						if (!activeTetromino->checkColision(notActiveTetrominos, ROTATE, 200))
-						{
-							activeTetromino->rotate();
-						}
+						msg.moveType = MoveType::ROTATE;
 					}
 					else if (event.key.code == sf::Keyboard::Space)
 					{
-						int dropAmount = activeTetromino->getDropCount(notActiveTetrominos, 200);
-						activeTetromino->drop(dropAmount);
+						msg.moveType = MoveType::DROP;
 					}
+					sf::Packet movePacket;
+					movePacket.clear();
+					movePacket << msg.cmd << msg.moveType << msg.userId << msg.dropCount;
+					localPlayer->send(movePacket);
 				}
 			}
 		}
