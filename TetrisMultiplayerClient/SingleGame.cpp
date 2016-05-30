@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "SingleGame.h"
 #include <thread>
+#include <iostream>
+
 
 using namespace std;
 
@@ -15,13 +17,19 @@ SingleGame::~SingleGame()
 
 void SingleGame::run()
 {
+
 	sf::RenderWindow window(sf::VideoMode(200, 400), "Tetris Multiplayer");
 	window.setActive(true);
+	
 	placeNewTetromino();
+	
 	while (window.isOpen())
 	{
 		checkPlayersMove(window);
+		
 		notActiveTetrominos.clearLine(getLineToClear());
+		
+		/*
 		if (checkForInactiveBlock())
 		{
 			if (!placeNewTetromino())
@@ -29,19 +37,20 @@ void SingleGame::run()
 				return;
 			}
 		}
-		
+		*/
 		displayInWindow(window);
-
-
+	
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
+	
 }
 
 void SingleGame::displayInWindow(sf::RenderWindow & window)
 {
 	window.clear();
-	Tetromino activeTetromino = *player.getActiveTetromino();
-	for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
+	shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
+	
+	for (sf::RectangleShape rectangle : activeTetromino->getDrawableItems())
 	{
 		window.draw(rectangle);
 	}
@@ -106,6 +115,8 @@ bool SingleGame::placeNewTetromino()
 	shared_ptr<Tetromino> newTetromino = tetrominoFactory.getRandomTetromino(player.getStartPosition());
 	if (!newTetromino->checkColision(notActiveTetrominos, DOWN, 200))
 	{
+		cout << endl << "OK, " << newTetromino << endl;
+
 		player.setActiveTetromino(newTetromino);
 		return true;
 	}

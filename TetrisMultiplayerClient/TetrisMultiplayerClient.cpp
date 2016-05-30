@@ -11,6 +11,8 @@
 #include "SFML\Network.hpp"
 #include "RemoteCmds.h"
 #include "LocalPlayer.h"
+#include "Cmds.h"
+#include "ServerListenerThread.h"
 
 using namespace std;
 
@@ -18,6 +20,7 @@ int main()
 {
 	string serverIp, nick;
 	int serverPort;
+	bool isConnectionOk = false;
 
 	cout << "TETRIS MULTIPLAYER SERVER" << endl << endl;
 	cout << "Autorzy: " << endl;
@@ -41,24 +44,30 @@ int main()
 	}
 
 	sf::Packet packet;
-	string cmd = "connect";
+	int cmd = connect;
 	packet << cmd << nick;
 	socket->send(packet);
 	packet.clear();
 	socket->receive(packet);
 	ConnectionStatusMsg msg;
 	packet >> msg.cmd >> msg.status;
-	if (msg.cmd != "connStatus" || msg.status == "rejected")
+	if (msg.cmd != connStatus || msg.status == "rejected")
 	{
 		cout << "Podczas laczenia z serwerem wystapil blad";
 	}
 	else if (msg.status == "accepted")
 	{
 		cout << "Nawiazano polaczenie z serwerem gry.";
+		isConnectionOk = true;
 	}
-	shared_ptr<LocalPlayer> localPlayer = shared_ptr<LocalPlayer>(new LocalPlayer(nick, socket));
-	string test;
-	cin >> test;
+	if (isConnectionOk)
+	{
+		shared_ptr<LocalPlayer> localPlayer = shared_ptr<LocalPlayer>(new LocalPlayer(nick, socket));
+		ServerListenerThread mainGameListener(localPlayer);
+		mainGameListener.launchListeners();
+	}
+	//string test;
+	//cin >> test;
 
 	return 0;
 }

@@ -1,5 +1,6 @@
 #pragma once
 enum GameType
 {
-	single, cooperation
+	single = 0, 
+	cooperation = 1
 };

@@ -1,25 +1,24 @@
 #pragma once
 #include <string>
-#include "Cmds.h"
 #include "TetrominoType.h"
 #include "GameType.h"
 
 struct ClientHelloMsg
 {
-	Cmds cmd;
+	int cmd;
 	string nick;
 };
 
 struct ConnectionStatusMsg
 {
-	Cmds cmd;
+	int cmd;
 	string status;
 };
 
 // gracz wysyla chec ruchu, serwer odsyla potwierdzenie gdy ruch jest ok
 struct MoveMsg
 {
-	Cmds cmd; //move
+	int cmd; //move
 	MoveType moveType; //down, left, right, drop
 	string userId; // nick
 	int dropCount; // 0 lub wartosc
@@ -28,23 +27,23 @@ struct MoveMsg
 //gracz wysyla info aby serwer utworzyl watek gry, gdy gra sie rozpocznie (sa wszyscy uzytkownicy) serwer odsyla info o rozpoczeciu gry
 struct StartGame
 {
-	Cmds cmd; // startGame
-	GameType gameType; // single, cooperation
+	int cmd; // startGame
+	int gameType; // single, cooperation
 	int playersNumber; // liczba graczy na ktorych oczekuje
-	list<string> userIds; // lista id graczy
+	string userIds; // lista id graczy oddzielone srednikami
 };
 
 //serwer wysyla info o tym ktora linia ma byc wyczyszczona
 struct ClearLine
 {
-	Cmds cmd; //clearLine
+	int cmd; //clearLine
 	int lineNumber; //numer linii
 };
 
 //serwer wysyla info gdzie umiescic tetromino, jakie i dla ktorego gracza
 struct PlaceTetromino
 {
-	Cmds cmd; // placeTetromino
+	int cmd; // placeTetromino
 	TetrominoType tetrominoType; //typ tetromino
 	string userId; // nick
 	int positionX;
@@ -54,20 +53,20 @@ struct PlaceTetromino
 //serwer wysyla: endGame, endServer, timeout(gdy czas oczekiwania na graczy przekroczony) klient wysy³a: getGamesList
 struct SimpleCommand
 {
-	Cmds cmd;
+	int cmd;
 };
 
 //serwer wysyla informacje o przyznaniu punktow
 struct AddScore
 {
-	Cmds cmd; //addScore
+	int cmd; //addScore
 	int score;
 };
 
 //serwer wysyla po otrzymaniu zapytania od gracza
 struct GamesList
 {
-	Cmds cmd; //gamesList
+	int cmd; //gamesList
 	list<int> gamesIds; // id gier oczekujacych na graczy
 	list<GameType> gameType; //typy gier oczekujacych na graczy
 };
@@ -75,7 +74,7 @@ struct GamesList
 //klient wysyla aby polaczyc sie do istniejacej gry
 struct ConnectToGame
 {
-	Cmds cmd; //connectToGame
+	int cmd; //connectToGame
 	int gameId; //id gry
 };
 

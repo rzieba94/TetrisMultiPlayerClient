@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include <iostream>
 
 
 Player::Player(string nick) : nick(nick)
@@ -34,6 +35,7 @@ void Player::setActiveTetromino(shared_ptr<Tetromino> activeTetromino)
 
 shared_ptr<Tetromino> Player::getActiveTetromino()
 {
+	cout << activeTetromino << endl;
 	return activeTetromino;
 }
 
