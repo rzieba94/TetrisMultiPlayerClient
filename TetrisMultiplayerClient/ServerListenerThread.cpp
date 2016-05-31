@@ -39,7 +39,6 @@ void ServerListenerThread::runServerListener()
 		{
 			PlaceTetromino msg;
 			incomingPacket >> msg.tetrominoType >> msg.userId >> msg.positionX >> msg.positionY;
-			cout << "odebrany klocek" << endl;
 			if (singleplayer)
 			{
 				sf::Vector2i tetPos((msg.positionX * Brick::BRICK_SIZE), (msg.positionY * Brick::BRICK_SIZE));
@@ -69,6 +68,15 @@ void ServerListenerThread::runServerListener()
 				localPlayer->getActiveTetromino()->drop(msg.dropCount);
 				break;
 			}
+		}
+			break;
+		case Cmds::clearLine:
+		{
+			ClearLine msg;
+			incomingPacket >> msg.lineNumber;
+			cout << msg.lineNumber << endl;
+			localPlayer->getActiveTetromino()->clearLine(msg.lineNumber);
+
 		}
 			break;
 		case Cmds::endGame:
