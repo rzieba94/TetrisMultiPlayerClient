@@ -12,8 +12,8 @@ public:
 	ParentGameEngine();
 	virtual ~ParentGameEngine();
 	void startThread();
-protected:
 	virtual void run() = 0;
+protected:
 	virtual void moveDownAllActiveBlocks() = 0;
 	virtual void displayInWindow(sf::RenderWindow & window) = 0;
 

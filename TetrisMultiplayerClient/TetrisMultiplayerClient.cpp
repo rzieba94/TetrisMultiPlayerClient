@@ -22,7 +22,7 @@ int main()
 	int serverPort;
 	bool isConnectionOk = false;
 
-	cout << "TETRIS MULTIPLAYER SERVER" << endl << endl;
+	cout << "TETRIS MULTIPLAYER CLIENT" << endl << endl;
 	cout << "Autorzy: " << endl;
 	cout << "Marcin Muskala" << endl;
 	cout << "Marek Nawrot" << endl;

@@ -2,9 +2,8 @@
 #include "Brick.h"
 
 
-Brick::Brick(sf::Vector2i & position, const sf::Color * color) : color(color)
+Brick::Brick(sf::Vector2i & position, const sf::Color * color) : color(color), position(position)
 {
-	this->position = position;
 }
 
 Brick::Brick(int positionX, int positionY, const sf::Color * color) : position(positionX, positionY), color(color)

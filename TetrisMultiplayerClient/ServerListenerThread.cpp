@@ -42,7 +42,7 @@ void ServerListenerThread::runServerListener()
 			cout << "odebrany klocek" << endl;
 			if (singleplayer)
 			{
-				sf::Vector2i tetPos(msg.positionX, msg.positionY);
+				sf::Vector2i tetPos((msg.positionX * Brick::BRICK_SIZE), (msg.positionY * Brick::BRICK_SIZE));
 				singleGame->placeNewTetromino(tetPos, (TetrominoType)msg.tetrominoType);
 			}
 		}
