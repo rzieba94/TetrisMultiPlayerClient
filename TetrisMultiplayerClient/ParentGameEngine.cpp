@@ -18,5 +18,4 @@ ParentGameEngine::~ParentGameEngine()
 void ParentGameEngine::startThread()
 {
 	gameThread = thread(&ParentGameEngine::run, this);
-	gameThread.join();
 }

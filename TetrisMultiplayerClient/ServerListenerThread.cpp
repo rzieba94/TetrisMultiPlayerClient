@@ -10,7 +10,7 @@
 
 
 
-ServerListenerThread::ServerListenerThread(shared_ptr<LocalPlayer> localPlayer) : localPlayer(localPlayer), isRunning(true), gameStarted(false)
+ServerListenerThread::ServerListenerThread(shared_ptr<LocalPlayer> localPlayer) : localPlayer(localPlayer), isRunning(true)
 {
 }
 
@@ -20,10 +20,7 @@ ServerListenerThread::~ServerListenerThread()
 
 void ServerListenerThread::launchListeners()
 {
-	thread serverListener(&ServerListenerThread::runServerListener, this);
-	thread clientListener(&ServerListenerThread::runClientListener, this);
-	serverListener.join();
-	clientListener.join();
+	runClientListener();
 }
 
 void ServerListenerThread::runServerListener()
@@ -38,24 +35,6 @@ void ServerListenerThread::runServerListener()
 		incomingPacket >> servMsg;
 		switch (servMsg)
 		{
-		case Cmds::startGame:
-		{
-			singleGame = new SingleGame(*localPlayer);
-			gameStarted = true;
-			StartGame msg;
-			incomingPacket >> msg.gameType >> msg.playersNumber >> msg.userIds;
-			cout << msg.gameType << msg.playersNumber << msg.userIds;
-			if (msg.gameType == GameType::single)
-			{
-				singleplayer = true;
-			}
-			else
-			{
-				//multi
-				singleplayer = false;
-			}
-		}
-			break;
 		case Cmds::placeTetromino:
 		{
 			PlaceTetromino msg;
@@ -104,13 +83,9 @@ void ServerListenerThread::runServerListener()
 
 void ServerListenerThread::runClientListener()
 {
-
 	int numCommand;
-
 	cout << endl << "Gra jednoosobowa - 1" << endl << "Gra wieloosobowa - 2" << endl;	
 	cin >> numCommand;
-
-
 	sf::Packet gameStartPacket;
 	gameStartPacket.clear();
 	StartGame msg;
@@ -132,53 +107,27 @@ void ServerListenerThread::runClientListener()
 	gameStartPacket << msg.cmd << msg.gameType << msg.playersNumber << msg.userIds;
 	localPlayer->send(gameStartPacket);
 
-	while (isRunning)
-	{
-		if (gameStarted)
+	gameStartPacket.clear();
+	gameStartPacket = localPlayer->receive();
+	int servMsg = -1;
+	gameStartPacket >> servMsg;
+	if (servMsg == Cmds::startGame) {
+		StartGame msg;
+		gameStartPacket >> msg.gameType >> msg.playersNumber >> msg.userIds;
+		cout << msg.gameType << msg.playersNumber << msg.userIds;
+		if (msg.gameType == GameType::single)
 		{
-			//TODO: ZWRACA NULLA POPRAWIC
-			sf::RenderWindow *window = singleGame->getWindow();
-			sf::Event event;
-			while (window->pollEvent(event))
-			{
-				if (event.type == sf::Event::Closed)
-				{
-					window->close();
-				}
-				else if (event.type == sf::Event::KeyPressed)
-				{
-					MoveMsg msg;
-					msg.cmd = Cmds::move;
-					msg.userId = localPlayer->getNick();
-					msg.dropCount = 0;
-					if (event.key.code == sf::Keyboard::Right)
-					{
-						msg.moveType = MoveType::RIGHT;
-					}
-					else if (event.key.code == sf::Keyboard::Left)
-					{
-						msg.moveType = MoveType::LEFT;
-					}
-					else if (event.key.code == sf::Keyboard::Down)
-					{
-						msg.moveType = MoveType::DOWN;
-					}
-					else if (event.key.code == sf::Keyboard::Up)
-					{
-						msg.moveType = MoveType::ROTATE;
-					}
-					else if (event.key.code == sf::Keyboard::Space)
-					{
-						msg.moveType = MoveType::DROP;
-					}
-					sf::Packet movePacket;
-					movePacket.clear();
-					movePacket << msg.cmd << msg.moveType << msg.userId << msg.dropCount;
-					localPlayer->send(movePacket);
-				}
-			}
+			singleplayer = true;
+			singleGame = new SingleGame(localPlayer);
+			thread singleGameThread(&SingleGame::run, singleGame);
+			thread serverListener(&ServerListenerThread::runServerListener, this);
+			singleGameThread.join();
+			serverListener.join();
 		}
-
-		std::this_thread::sleep_for(std::chrono::microseconds(100));
+		else
+		{
+			//multi
+			singleplayer = false;
+		}
 	}
 }

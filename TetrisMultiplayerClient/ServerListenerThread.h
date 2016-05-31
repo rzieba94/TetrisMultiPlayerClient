@@ -14,7 +14,6 @@ private:
 	SingleGame *singleGame;
 	bool isRunning;
 	bool singleplayer;
-	bool gameStarted;
 	void runServerListener();
 	void runClientListener();
 

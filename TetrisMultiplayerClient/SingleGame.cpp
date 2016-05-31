@@ -2,6 +2,9 @@
 #include "SingleGame.h"
 #include <thread>
 #include <iostream>
+#include "RemoteCmds.h"
+#include "Cmds.h"
+
 
 
 using namespace std;
@@ -10,9 +13,9 @@ SingleGame::SingleGame()
 {
 }
 
-SingleGame::SingleGame(Player player) : player(player), firstBrick(true)
+SingleGame::SingleGame(shared_ptr<LocalPlayer> player) : player(player), firstBrick(true)
 {
-	window = &sf::RenderWindow(sf::VideoMode(200, 400), "Tetris Multiplayer");
+	
 }
 
 SingleGame::~SingleGame()
@@ -21,11 +24,57 @@ SingleGame::~SingleGame()
 
 void SingleGame::run()
 {
-
-	window->setActive(true);
-	while (window->isOpen())
+	sf::RenderWindow window(sf::VideoMode(200, 400), "Tetris Multiplayer");
+	window.setActive(true);
+	while (window.isOpen())
 	{
-		displayInWindow(*window);
+		if (!firstBrick) {
+			displayInWindow(window);
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
+				{
+					SimpleCommand msg;
+					msg.cmd = Cmds::endGame;
+					sf::Packet closePacket;
+					closePacket << msg.cmd;
+					player->send(closePacket);
+					window.close();
+				}
+				else if (event.type == sf::Event::KeyPressed)
+				{
+					MoveMsg msg;
+					msg.cmd = Cmds::move;
+					msg.userId = player->getNick();
+					msg.dropCount = 0;
+					if (event.key.code == sf::Keyboard::Right)
+					{
+						msg.moveType = MoveType::RIGHT;
+					}
+					else if (event.key.code == sf::Keyboard::Left)
+					{
+						msg.moveType = MoveType::LEFT;
+					}
+					else if (event.key.code == sf::Keyboard::Down)
+					{
+						msg.moveType = MoveType::DOWN;
+					}
+					else if (event.key.code == sf::Keyboard::Up)
+					{
+						msg.moveType = MoveType::ROTATE;
+					}
+					else if (event.key.code == sf::Keyboard::Space)
+					{
+						msg.moveType = MoveType::DROP;
+					}
+					sf::Packet movePacket;
+					movePacket.clear();
+					movePacket << msg.cmd << msg.moveType << msg.userId << msg.dropCount;
+					player->send(movePacket);
+				}
+			}
+		}
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
 	
@@ -34,7 +83,7 @@ void SingleGame::run()
 void SingleGame::displayInWindow(sf::RenderWindow & window)
 {
 	window.clear();
-		Tetromino activeTetromino = *player.getActiveTetromino();
+		Tetromino activeTetromino = *player->getActiveTetromino();
 		for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
 		{
 			window.draw(rectangle);
@@ -56,13 +105,8 @@ bool SingleGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type)
 	shared_ptr<Tetromino> newTetromino = tetrominoFactory.getTetromino(pos, type);
 	if (!newTetromino->checkColision(notActiveTetrominos, DOWN, 200))
 	{
-		player.setActiveTetromino(newTetromino);
-		if (firstBrick)
-		{
-			firstBrick = false;
-			run();
-			cout << "odpalamy";
-		}
+		player->setActiveTetromino(newTetromino);
+		firstBrick = false;
 		return true;
 	}
 	else
@@ -100,7 +144,7 @@ int SingleGame::getLineToClear()
 
 bool SingleGame::checkForInactiveBlock()
 {
-	shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
+	shared_ptr<Tetromino> activeTetromino = player->getActiveTetromino();
 	if (activeTetromino->checkColision(notActiveTetrominos, DOWN, 200))
 	{
 		notActiveTetrominos.addTetrisShape(activeTetromino);
@@ -114,10 +158,5 @@ bool SingleGame::checkForInactiveBlock()
 
 void SingleGame::moveDownAllActiveBlocks()
 {
-	player.getActiveTetromino()->moveDown();
-}
-
-sf::RenderWindow *SingleGame::getWindow()
-{
-	return window;
+	player->getActiveTetromino()->moveDown();
 }
