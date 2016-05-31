@@ -74,19 +74,30 @@ void ServerListenerThread::runServerListener()
 		{
 			ClearLine msg;
 			incomingPacket >> msg.lineNumber;
-			cout << msg.lineNumber << endl;
-			localPlayer->getActiveTetromino()->clearLine(msg.lineNumber);
-
+			singleGame->clearLine(msg.lineNumber);
+		}
+			break;
+		case Cmds::addScore:
+		{
+			AddScore msg;
+			incomingPacket >> msg.score;
+			localPlayer->addScore(msg.score);
 		}
 			break;
 		case Cmds::endGame:
 			isRunning = false;
+			singleGame->endGameCloseWindow();
+			delete(singleGame);
+			cout << "Koniec gry " << localPlayer->getNick() << "! Uzyskales " << localPlayer->getScore() << " punktow!" << endl;
 			break;
 		default:
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 	}
+	string endMsg= "Wcisnij enter aby zakonczyc";
+	cout << endMsg << endl;
+	cin >> endMsg;
 }
 
 void ServerListenerThread::runClientListener()
@@ -122,7 +133,6 @@ void ServerListenerThread::runClientListener()
 	if (servMsg == Cmds::startGame) {
 		StartGame msg;
 		gameStartPacket >> msg.gameType >> msg.playersNumber >> msg.userIds;
-		cout << msg.gameType << msg.playersNumber << msg.userIds;
 		if (msg.gameType == GameType::single)
 		{
 			singleplayer = true;

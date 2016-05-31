@@ -7,7 +7,7 @@
 
 using namespace std;
 
-SingleGame::SingleGame(shared_ptr<LocalPlayer> player) : player(player), firstBrick(true)
+SingleGame::SingleGame(shared_ptr<LocalPlayer> player) : player(player), firstBrick(true), closeWindow(false)
 {
 	
 }
@@ -25,6 +25,10 @@ void SingleGame::run()
 		if (!firstBrick) {
 			displayInWindow(window);
 			checkPlayersMove(window);
+		}
+		if (closeWindow)
+		{
+			window.close();
 		}
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
@@ -44,6 +48,17 @@ void SingleGame::displayInWindow(sf::RenderWindow & window)
 	}
 	window.display();
 }
+
+void SingleGame::clearLine(int lineNumber)
+{
+	notActiveTetrominos.clearLine(lineNumber);
+}
+
+void SingleGame::endGameCloseWindow()
+{
+	closeWindow = true;
+}
+
 
 void SingleGame::checkPlayersMove(sf::RenderWindow & window)
 {

@@ -10,14 +10,16 @@ public:
 	SingleGame(shared_ptr<LocalPlayer> player);
 	~SingleGame();
 	void placeNewTetromino(sf::Vector2i pos,TetrominoType type);
+	void clearLine(int lineNumber);
+	void endGameCloseWindow();
 	void run();
 private:
 	
 	void displayInWindow(sf::RenderWindow & window);
 	void moveDownAllActiveBlocks();
 	void checkPlayersMove(sf::RenderWindow & window);
-
 	shared_ptr<LocalPlayer> player;
 	bool firstBrick;
+	bool closeWindow;
 };
 

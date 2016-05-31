@@ -70,7 +70,7 @@ void Tetromino::clearLine(int lineNumber)
 	if (lineNumber != -1)
 	{
 		list<shared_ptr<Brick>>::iterator it = bricksList.begin();
-		while (it != bricksList.end())
+		while (!bricksList.empty() && it != bricksList.end())
 		{
 			int brickPositionY = (*it)->getPosition().y;
 			int clearedLine = lineNumber * Brick::BRICK_SIZE;
@@ -84,7 +84,14 @@ void Tetromino::clearLine(int lineNumber)
 				{
 					(*it)->move(sf::Vector2i(0, Brick::BRICK_SIZE));
 				}
-				it++;
+				if (!bricksList.empty() && it != bricksList.end())
+				{
+					it++;
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 	}
