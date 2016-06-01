@@ -106,6 +106,7 @@ void ServerListenerThread::runServerListener()
 
 void ServerListenerThread::runClientListener()
 {
+	bool startingNewGame = false;
 	int numCommand;
 	cout << "ROZPOCZNIJ NOWA GRE";
 	cout << endl << "Gra jednoosobowa - 1" << endl << "Gra wieloosobowa - 2" << endl;	
@@ -116,6 +117,7 @@ void ServerListenerThread::runClientListener()
 	msg.cmd = startGame;
 	if (numCommand == 1)
 	{
+		startingNewGame = true;
 		isRunning = true;
 		msg.gameType = GameType::single;
 		msg.playersNumber = 1;
@@ -131,10 +133,45 @@ void ServerListenerThread::runClientListener()
 			cin >> numCommand;
 			if(numCommand <= 4)
 			{
+				startingNewGame = true;
 				isRunning = true;
 				msg.gameType = GameType::cooperation;
 				msg.playersNumber = numCommand;
 				msg.userIds = localPlayer->getNick() + ";";
+			}
+		}
+		else
+		{
+			GamesList glist;
+			glist.cmd = Cmds::getGamesList;
+			sf::Packet pack;
+			pack << glist.cmd;
+			localPlayer->send(pack);
+			pack.clear();
+			pack = localPlayer->receive();
+			int gMsg;
+			pack >> gMsg;
+			if (gMsg == Cmds::getGamesList)
+			{
+				pack >> glist.gamesIds >> glist.nickNames;
+				cout << "Lista dostepnych gier. Aby doloczyc wpisz id gry." << endl;
+				cout << "ID |  GRACZE" << endl;;
+				vector<string> ids = StringSplitter::split(glist.gamesIds, ';');
+				vector<string> nicknames = StringSplitter::split(glist.nickNames, '|');
+				int i = 0;
+				for (string id : ids)
+				{
+					cout << id <<"  |  " << nicknames[i++] << endl;
+				}
+				int selectedID = -1;
+				cin >> selectedID;
+				ConnectToGame connectMsg;
+				connectMsg.cmd = Cmds::connectToGame;
+				connectMsg.gameId = selectedID;
+				sf::Packet connectPacket;
+				connectPacket.clear();
+				connectPacket << connectMsg.cmd << connectMsg.gameId;
+				localPlayer->send(connectPacket);
 			}
 		}
 		
@@ -144,8 +181,12 @@ void ServerListenerThread::runClientListener()
 		msg.cmd = Cmds::endGame;
 		isRunning = false;
 	}
-	gameStartPacket << msg.cmd << msg.gameType << msg.playersNumber << msg.userIds;
-	localPlayer->send(gameStartPacket);
+
+	if (startingNewGame)
+	{
+		gameStartPacket << msg.cmd << msg.gameType << msg.playersNumber << msg.userIds;
+		localPlayer->send(gameStartPacket);
+	}
 
 	bool gameStarted = false;
 	int lastTime = -1;
@@ -200,13 +241,14 @@ void ServerListenerThread::runClientListener()
 			system("cls");
 			runClientListener();
 		}
+		/*
 		else
 		{
 			gameStarted = true;
 			cout << "POLACZENIE Z SERWEREM ZOSTALO PRZERWANE, APLIKACJA ZOSTANIE ZAMKNIETA" << endl;
 			std::cin.ignore();
 			std::cin.ignore();
-		}
+		}*/
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }

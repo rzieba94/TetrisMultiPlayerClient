@@ -67,8 +67,8 @@ struct AddScore
 struct GamesList
 {
 	int cmd; //gamesList
-	list<int> gamesIds; // id gier oczekujacych na graczy
-	list<GameType> gameType; //typy gier oczekujacych na graczy
+	string gamesIds; // id gier oczekujacych na graczy
+	string nickNames; //typy gier oczekujacych na graczy
 };
 
 //klient wysyla aby polaczyc sie do istniejacej gry
