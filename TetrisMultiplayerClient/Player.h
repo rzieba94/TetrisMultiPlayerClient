@@ -8,7 +8,8 @@ using namespace std;
 class Player
 {
 public:
-	Player(string nick, int position);
+	Player();
+	Player(string nick);
 	~Player();
 	void addScore(int score);
 	const int getScore();
@@ -16,6 +17,7 @@ public:
 	void setActiveTetromino(shared_ptr<Tetromino> activeTetromino);
 	shared_ptr<Tetromino> getActiveTetromino();
 	sf::Vector2i getStartPosition();
+	void setStartPosition(int startPosition);
 private:
 	string nick;
 	int score;

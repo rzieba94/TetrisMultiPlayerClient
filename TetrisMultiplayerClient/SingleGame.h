@@ -1,22 +1,25 @@
 #pragma once
 #include "ParentGameEngine.h"
-#include "Player.h"
+#include "LocalPlayer.h"
 
 using namespace std;
 
 class SingleGame : public ParentGameEngine
 {
 public:
-	SingleGame(Player player);
+	SingleGame(shared_ptr<LocalPlayer> player);
 	~SingleGame();
-private:
+	void placeNewTetromino(sf::Vector2i pos,TetrominoType type);
+	void clearLine(int lineNumber);
+	void endGameCloseWindow();
 	void run();
+private:
+	
 	void displayInWindow(sf::RenderWindow & window);
 	void moveDownAllActiveBlocks();
-	bool placeNewTetromino();
-	int getLineToClear();
-	bool checkForInactiveBlock();
 	void checkPlayersMove(sf::RenderWindow & window);
-	Player player;
+	shared_ptr<LocalPlayer> player;
+	bool firstBrick;
+	bool closeWindow;
 };
 

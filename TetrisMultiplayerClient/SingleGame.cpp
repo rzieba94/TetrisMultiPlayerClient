@@ -1,13 +1,16 @@
 #include "stdafx.h"
 #include "SingleGame.h"
 #include <thread>
+#include <iostream>
+#include "RemoteCmds.h"
+#include "Cmds.h"
 
 using namespace std;
 
-SingleGame::SingleGame(Player player) : player(player)
+SingleGame::SingleGame(shared_ptr<LocalPlayer> player) : player(player), firstBrick(true), closeWindow(false)
 {
+	
 }
-
 
 SingleGame::~SingleGame()
 {
@@ -17,22 +20,16 @@ void SingleGame::run()
 {
 	sf::RenderWindow window(sf::VideoMode(200, 400), "Tetris Multiplayer");
 	window.setActive(true);
-	placeNewTetromino();
 	while (window.isOpen())
 	{
-		checkPlayersMove(window);
-		notActiveTetrominos.clearLine(getLineToClear());
-		if (checkForInactiveBlock())
-		{
-			if (!placeNewTetromino())
-			{
-				return;
-			}
+		if (!firstBrick) {
+			displayInWindow(window);
+			checkPlayersMove(window);
 		}
-		
-		displayInWindow(window);
-
-		checkFrameTime();
+		if (closeWindow)
+		{
+			window.close();
+		}
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
 }
@@ -40,17 +37,28 @@ void SingleGame::run()
 void SingleGame::displayInWindow(sf::RenderWindow & window)
 {
 	window.clear();
-	Tetromino activeTetromino = *player.getActiveTetromino();
+	Tetromino activeTetromino = *player->getActiveTetromino();
 	for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
 	{
 		window.draw(rectangle);
-	}
+	}	
 	for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
 	{
 		window.draw(rectangle);
 	}
 	window.display();
 }
+
+void SingleGame::clearLine(int lineNumber)
+{
+	notActiveTetrominos.clearLine(lineNumber);
+}
+
+void SingleGame::endGameCloseWindow()
+{
+	closeWindow = true;
+}
+
 
 void SingleGame::checkPlayersMove(sf::RenderWindow & window)
 {
@@ -59,102 +67,61 @@ void SingleGame::checkPlayersMove(sf::RenderWindow & window)
 	{
 		if (event.type == sf::Event::Closed)
 		{
+			SimpleCommand msg;
+			msg.cmd = Cmds::endGame;
+			sf::Packet closePacket;
+			closePacket << msg.cmd;
+			player->send(closePacket);
 			window.close();
 		}
 		else if (event.type == sf::Event::KeyPressed)
 		{
-			shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
+			MoveMsg msg;
+			msg.cmd = Cmds::move;
+			msg.userId = player->getNick();
+			msg.dropCount = 0;
 			if (event.key.code == sf::Keyboard::Right)
 			{
-				if (!activeTetromino->checkColision(notActiveTetrominos, RIGHT, 200))
-				{
-					activeTetromino->moveRight();
-				}
+				msg.moveType = MoveType::RIGHT;
 			}
 			else if (event.key.code == sf::Keyboard::Left)
 			{
-				if (!activeTetromino->checkColision(notActiveTetrominos, LEFT, 200))
-				{
-					activeTetromino->moveLeft();
-				}
+				msg.moveType = MoveType::LEFT;
 			}
 			else if (event.key.code == sf::Keyboard::Down)
 			{
-				if (!activeTetromino->checkColision(notActiveTetrominos, DOWN, 200))
-				{
-					activeTetromino->moveDown();
-				}
+				msg.moveType = MoveType::DOWN;
 			}
 			else if (event.key.code == sf::Keyboard::Up)
 			{
-				if (!activeTetromino->checkColision(notActiveTetrominos, ROTATE, 200))
-				{
-					activeTetromino->rotate();
-				}
+				msg.moveType = MoveType::ROTATE;
 			}
 			else if (event.key.code == sf::Keyboard::Space)
 			{
-				int dropAmount = activeTetromino->getDropCount(notActiveTetrominos, 200);
-				activeTetromino->drop(dropAmount);
+				msg.moveType = MoveType::DROP;
 			}
+			sf::Packet movePacket;
+			movePacket.clear();
+			movePacket << msg.cmd << msg.moveType << msg.userId << msg.dropCount;
+			player->send(movePacket);
 		}
 	}
 }
 
-bool SingleGame::placeNewTetromino()
+void SingleGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type)
 {
-	shared_ptr<Tetromino> newTetromino = tetrominoFactory.getRandomTetromino(player.getStartPosition());
-	if (!newTetromino->checkColision(notActiveTetrominos, DOWN, 200))
+	if (!firstBrick)
 	{
-		player.setActiveTetromino(newTetromino);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-int SingleGame::getLineToClear()
-{
-	int previousLine = 0, currentLine = 0, brickCounter = 0 ;
-
-	list<shared_ptr<Brick>> bricksList = notActiveTetrominos.getBricksList();
-	vector <int> bricksInRowsCounter(20, 0);
-	
-	for (shared_ptr<Brick> brick : notActiveTetrominos.getBricksList())
-	{
-		sf::Vector2i brickPosition = brick->getPosition();
-		int brickRow = brickPosition.y / Brick::BRICK_SIZE;
-		bricksInRowsCounter[brickRow]++;
+		shared_ptr<Tetromino> previousTetromino = player->getActiveTetromino();
+		notActiveTetrominos.addTetrisShape(previousTetromino);
 	}
 
-	for (int lineNo = 0; lineNo < bricksInRowsCounter.size() ; lineNo++)
-	{
-		if (bricksInRowsCounter[lineNo] == 10)
-		{
-			return lineNo;
-		}
-	}
-	return -1;
-}
-
-bool SingleGame::checkForInactiveBlock()
-{
-	shared_ptr<Tetromino> activeTetromino = player.getActiveTetromino();
-	if (activeTetromino->checkColision(notActiveTetrominos, DOWN, 200))
-	{
-		notActiveTetrominos.addTetrisShape(activeTetromino);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	shared_ptr<Tetromino> newTetromino = tetrominoFactory.getTetromino(pos, type);
+	player->setActiveTetromino(newTetromino);
+	firstBrick = false;
 }
 
 void SingleGame::moveDownAllActiveBlocks()
 {
-	player.getActiveTetromino()->moveDown();
+	player->getActiveTetromino()->moveDown();
 }
-

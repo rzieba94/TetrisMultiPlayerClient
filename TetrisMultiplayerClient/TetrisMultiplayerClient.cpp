@@ -7,107 +7,67 @@
 #include "TetrominoI.h"
 #include "TetrominoFactory.h"
 #include "SingleGame.h"
+#include <string>
+#include "SFML\Network.hpp"
+#include "RemoteCmds.h"
+#include "LocalPlayer.h"
+#include "Cmds.h"
+#include "ServerListenerThread.h"
 
 using namespace std;
 
 int main()
 {
-	Player player("Player", 1);
-	ParentGameEngine *singleGame = new SingleGame(player);
+	string serverIp, nick;
+	int serverPort;
+	bool isConnectionOk = false;
 
-	singleGame->startThread();
-	while (true)
+	cout << "TETRIS MULTIPLAYER CLIENT" << endl << endl;
+	cout << "Autorzy: " << endl;
+	cout << "Marcin Muskala" << endl;
+	cout << "Marek Nawrot" << endl;
+	cout << "Michal Sliwa" << endl;
+	cout << "Rafal Zieba" << endl << endl;
+
+	cout << "Podaj numer ip serwera: ";
+	cin >> serverIp;
+	cout << "Podaj numer portu dla serwera: ";
+	cin >> serverPort;
+	cout << "Podaj swoj nick: ";
+	cin >> nick;
+
+	shared_ptr<sf::TcpSocket> socket = shared_ptr<sf::TcpSocket>(new sf::TcpSocket);
+	sf::Socket::Status status = socket->connect(serverIp, serverPort);
+	if (status != sf::Socket::Done)
 	{
-		this_thread::sleep_for(chrono::milliseconds(100000));
+		cout << "Podczas laczenia z serwerem wystapil blad.";
 	}
 
-	/*sf::RenderWindow window(sf::VideoMode(200, 400), "SFML works!");
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
-	sf::RectangleShape rectangle;
-	sf::Vector2i  vector = sf::Vector2i(100,40);
-	sf::Vector2i  vector2 = sf::Vector2i(100, 380);
-
-	TetrominoFactory tetrominoFactory = TetrominoFactory();
-	Tetromino tetromino = tetrominoFactory.getRandomTetromino(vector);
-	Tetromino *tet = &tetromino;
-	Tetromino tetromino2 = tetrominoFactory.getRandomTetromino(vector2);
-	Tetromino *tet2 = &tetromino2;
-
-	while (window.isOpen())
+	sf::Packet packet;
+	int cmd = connect;
+	packet << cmd << nick;
+	socket->send(packet);
+	packet.clear();
+	socket->receive(packet);
+	ConnectionStatusMsg msg;
+	packet >> msg.cmd >> msg.status;
+	if (msg.cmd != connStatus || msg.status == "rejected")
 	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
-			if (event.type == sf::Event::KeyPressed)
-			{
-				if (event.key.code == sf::Keyboard::Right)
-				{
-					std::cout << "right";
-					if (!tet->checkColision(*tet2, RIGHT, 200))
-					{
-						tet->moveRight();
-					}
-				}
-				else if (event.key.code == sf::Keyboard::Left)
-				{
-					std::cout << "left";
-					if (!tet->checkColision(*tet2, LEFT, 200))
-					{
-						tet->moveLeft();
-					}
-				}
-				else if (event.key.code == sf::Keyboard::Down)
-				{
-					std::cout << "down";
-					if (!tet->checkColision(*tet2, DOWN, 200))
-					{
-						tet->moveDown();
-					}
-				}
-				else if (event.key.code == sf::Keyboard::Up)
-				{
-					std::cout << "rotate";
-					if (!tet->checkColision(*tet2, ROTATE, 200))
-					{
-						tet->rotate();
-					}
-				}
-				else if (event.key.code == sf::Keyboard::R)
-				{
-					std::cout << "random";
-					tetromino = tetrominoFactory.getRandomTetromino(vector);
-				}
-				else if (event.key.code == sf::Keyboard::Space)
-				{
-					std::cout << "drop";
-					int dropAmount = tet->getDropCount(*tet2, 200);
-					tet->drop(dropAmount);
-				}
-				else if (event.key.code == sf::Keyboard::C)
-				{
-					std::cout << "clear line 2";
-					tet->clearLine(2);
-				}
-				else
-				{
-					std::cout << event.key.code;
-				}
-			}
-		}
-		window.clear();
-		for (sf::RectangleShape rectangle : tet->getDrawableItems())
-		{
-			window.draw(rectangle);
-		}
-		for (sf::RectangleShape rectangle : tet2->getDrawableItems())
-		{
-			window.draw(rectangle);
-		}
-		window.display();
-	}*/
+		cout << "Podczas laczenia z serwerem wystapil blad";
+	}
+	else if (msg.status == "accepted")
+	{
+		cout << "Nawiazano polaczenie z serwerem gry.";
+		isConnectionOk = true;
+	}
+	if (isConnectionOk)
+	{
+		shared_ptr<LocalPlayer> localPlayer = shared_ptr<LocalPlayer>(new LocalPlayer(nick, socket));
+		ServerListenerThread mainGameListener(localPlayer);
+		mainGameListener.launchListeners();
+	}
+	//string test;
+	//cin >> test;
 
 	return 0;
 }

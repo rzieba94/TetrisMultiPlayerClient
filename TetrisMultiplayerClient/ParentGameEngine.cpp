@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ParentGameEngine.h"
+#include <iostream>
 
 using namespace std;
 
@@ -17,13 +18,4 @@ ParentGameEngine::~ParentGameEngine()
 void ParentGameEngine::startThread()
 {
 	gameThread = thread(&ParentGameEngine::run, this);
-}
-
-void ParentGameEngine::checkFrameTime()
-{
-	if (clock() - startTime > FRAME_DURATION)
-	{
-		moveDownAllActiveBlocks();
-		startTime = clock();
-	}
 }
