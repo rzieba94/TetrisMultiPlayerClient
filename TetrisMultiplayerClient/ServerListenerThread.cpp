@@ -6,7 +6,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <stdlib.h>
 #include "StringSplitter.h"
+#include <cstdio>
 
 
 
@@ -95,14 +97,17 @@ void ServerListenerThread::runServerListener()
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 	}
-	string endMsg= "Wcisnij enter aby zakonczyc";
-	cout << endMsg << endl;
-	cin >> endMsg;
+	cout << "Wcisnij enter aby wrocic do menu" << endl;
+	std::cin.ignore();
+	std::cin.ignore();
+	system("cls");
+	runClientListener();
 }
 
 void ServerListenerThread::runClientListener()
 {
 	int numCommand;
+	cout << "ROZPOCZNIJ NOWA GRE";
 	cout << endl << "Gra jednoosobowa - 1" << endl << "Gra wieloosobowa - 2" << endl;	
 	cin >> numCommand;
 	sf::Packet gameStartPacket;
@@ -111,41 +116,97 @@ void ServerListenerThread::runClientListener()
 	msg.cmd = startGame;
 	if (numCommand == 1)
 	{
+		isRunning = true;
 		msg.gameType = GameType::single;
 		msg.playersNumber = 1;
-		msg.userIds = "1;";
+		msg.userIds = localPlayer->getNick() + ";";
 	}
 	else if (numCommand == 2)
 	{
-
+		cout << endl << "Zaloz gre - 1" << endl << "Dolacz do gry - 2" << endl;
+		cin >> numCommand;
+		if (numCommand == 1)
+		{
+			cout << endl << "Podaj liczbê graczy (max 4)" << endl;
+			cin >> numCommand;
+			if(numCommand <= 4)
+			{
+				isRunning = true;
+				msg.gameType = GameType::cooperation;
+				msg.playersNumber = numCommand;
+				msg.userIds = localPlayer->getNick() + ";";
+			}
+		}
+		
 	}
 	else
 	{
+		msg.cmd = Cmds::endGame;
 		isRunning = false;
 	}
 	gameStartPacket << msg.cmd << msg.gameType << msg.playersNumber << msg.userIds;
 	localPlayer->send(gameStartPacket);
 
-	gameStartPacket.clear();
-	gameStartPacket = localPlayer->receive();
-	int servMsg = -1;
-	gameStartPacket >> servMsg;
-	if (servMsg == Cmds::startGame) {
-		StartGame msg;
-		gameStartPacket >> msg.gameType >> msg.playersNumber >> msg.userIds;
-		if (msg.gameType == GameType::single)
+	bool gameStarted = false;
+	int lastTime = -1;
+	while (!gameStarted)
+	{
+		gameStartPacket.clear();
+		gameStartPacket = localPlayer->receive();
+		int servMsg = -1;
+		gameStartPacket >> servMsg;
+		if (servMsg == Cmds::startGame) {
+			StartGame msg;
+			gameStartPacket >> msg.gameType >> msg.playersNumber >> msg.userIds;
+			if (msg.gameType == GameType::single)
+			{
+				gameStarted = true;
+				singleplayer = true;
+				singleGame = new SingleGame(localPlayer);
+				thread singleGameThread(&SingleGame::run, singleGame);
+				thread serverListener(&ServerListenerThread::runServerListener, this);
+				singleGameThread.join();
+				serverListener.join();
+			}
+			else if (msg.gameType == GameType::cooperation)
+			{
+				gameStarted = true;
+				singleplayer = false;
+				//coop
+			}
+		}
+		else if (servMsg == Cmds::waiting)
 		{
-			singleplayer = true;
-			singleGame = new SingleGame(localPlayer);
-			thread singleGameThread(&SingleGame::run, singleGame);
-			thread serverListener(&ServerListenerThread::runServerListener, this);
-			singleGameThread.join();
-			serverListener.join();
+			
+			WaitingTime msg;
+			gameStartPacket >> msg.waitingtime;
+			if (msg.waitingtime % 10 == 0 && msg.waitingtime != lastTime)
+			{
+				lastTime = msg.waitingtime;
+				cout << "Oczekiwanie na graczy. Pozostaly czas: " << msg.waitingtime << endl;
+			}
+		}
+		else if(servMsg == Cmds::timeout)
+		{ 
+			gameStarted = true;
+			SimpleCommand msg;
+			msg.cmd = Cmds::endGame;
+			sf::Packet closePacket;
+			closePacket << msg.cmd;
+			localPlayer->send(closePacket);
+			cout << "Zbyt d³ugi czas oczekiwania. Wcisnij enter aby wrocic do menu." << endl;
+			std::cin.ignore();
+			std::cin.ignore();
+			system("cls");
+			runClientListener();
 		}
 		else
 		{
-			//multi
-			singleplayer = false;
+			gameStarted = true;
+			cout << "POLACZENIE Z SERWEREM ZOSTALO PRZERWANE, APLIKACJA ZOSTANIE ZAMKNIETA" << endl;
+			std::cin.ignore();
+			std::cin.ignore();
 		}
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
