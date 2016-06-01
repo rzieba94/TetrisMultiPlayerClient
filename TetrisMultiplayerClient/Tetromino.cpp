@@ -84,10 +84,7 @@ void Tetromino::clearLine(int lineNumber)
 				{
 					(*it)->move(sf::Vector2i(0, Brick::BRICK_SIZE));
 				}
-				if (it != bricksList.end())
-				{
-					it++;
-				}
+				++it;
 			}
 		}
 	}
