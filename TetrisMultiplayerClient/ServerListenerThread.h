@@ -1,6 +1,7 @@
 #pragma once
 #include "LocalPlayer.h"
 #include "SingleGame.h"
+#include "CooperationGame.h"
 #include <memory>
 
 class ServerListenerThread
@@ -12,6 +13,7 @@ public:
 private:
 	shared_ptr<LocalPlayer> localPlayer;
 	SingleGame *singleGame;
+	CooperationGame *coopGame;
 	bool isRunning;
 	bool singleplayer;
 	void runServerListener();

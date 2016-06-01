@@ -54,6 +54,7 @@ struct PlaceTetromino
 struct SimpleCommand
 {
 	int cmd;
+	bool winner = false;
 };
 
 //serwer wysyla informacje o przyznaniu punktow
@@ -83,4 +84,11 @@ struct WaitingTime
 {
 	int cmd;
 	int waitingtime;
+};
+
+struct sendUserLost
+{
+	int cmd;
+	string nick;
+	int score;
 };

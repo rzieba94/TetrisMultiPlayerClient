@@ -86,13 +86,29 @@ void ServerListenerThread::runServerListener()
 			localPlayer->addScore(msg.score);
 		}
 			break;
+			if (!singleplayer) {
+		case Cmds::userLost:
+		{
+			sendUserLost lost;
+			incomingPacket >> lost.nick >> lost.score;
+			cout << "Gracz " << lost.nick << " zakonczyl gre z wynikiem " << lost.score << " punktow!" << endl;
+		}
+		break;
+			}
 		case Cmds::endGame:
 			isRunning = false;
+			bool winner = false;
+			incomingPacket >> winner;
 			singleGame->endGameCloseWindow();
 			delete(singleGame);
-			cout << "Koniec gry " << localPlayer->getNick() << "! Uzyskales " << localPlayer->getScore() << " punktow!" << endl;
-			break;
-		default:
+			if (!winner)
+			{
+				cout << "Koniec gry " << localPlayer->getNick() << "! Uzyskales " << localPlayer->getScore() << " punktow!" << endl;
+			}
+			else
+			{
+				cout << "Wygrales " << localPlayer->getNick() << "! Uzyskales " << localPlayer->getScore() << " punktow!" << endl;
+			}
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
@@ -213,7 +229,11 @@ void ServerListenerThread::runClientListener()
 			{
 				gameStarted = true;
 				singleplayer = false;
-				//coop
+				singleGame = new SingleGame(localPlayer);
+				thread singleGameThread(&SingleGame::run, singleGame);
+				thread serverListener(&ServerListenerThread::runServerListener, this);
+				singleGameThread.join();
+				serverListener.join();
 			}
 		}
 		else if (servMsg == Cmds::waiting)

@@ -14,5 +14,6 @@ enum Cmds
 	endServer = 9,
 	timeout = 10, 
 	getGamesList = 11,
-	waiting = 12
+	waiting = 12,
+	userLost = 13
 };
