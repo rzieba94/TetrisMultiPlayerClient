@@ -1,7 +1,7 @@
 # TetrisMultiPlayerClient
 This is a game called Tetris.
 
-Jak zainstalować:
+##Jak zainstalować:
 1. Pobierz projekt z repozytorium.
 2. Jeœli masz Microsoft Visual Studio 2015 użyj tego linku: http://www.sfml-dev.org/files/SFML-2.3.2-windows-vc14-64-bit.zip
 3. Rozpakuj ten plik na dysku C:\
@@ -10,7 +10,7 @@ Jak zainstalować:
 6. Uruchom ten projekt.
 
 
-How to install:
+##How to install:
 1. Download this project from repository.
 2. If you have Microsoft Visual Studio 2015 use this link: http://www.sfml-dev.org/files/SFML-2.3.2-windows-vc14-64-bit.zip
 3. Unzip this file into C:\
@@ -19,8 +19,8 @@ How to install:
 6. Run this project.
 If you have other version of Visual Studio there is a link for sfml library: http://www.sfml-dev.org/download/sfml/2.3.2/
 
-Autorzy/Authors:
-Marcin Muskała
-Marek Nawrot
-Michał Śliwa
-Rafał Zięba
+##Autorzy/Authors:
+* Marcin Muskała
+* Marek Nawrot
+* Michał Śliwa
+* Rafał Zięba
