@@ -41,14 +41,15 @@ void ServerListenerThread::runServerListener()
 		{
 			PlaceTetromino msg;
 			incomingPacket >> msg.tetrominoType >> msg.userId >> msg.positionX >> msg.positionY;
+			sf::Vector2i tetPos((msg.positionX * Brick::BRICK_SIZE), (msg.positionY * Brick::BRICK_SIZE));
 			if (singleplayer)
 			{
-				sf::Vector2i tetPos((msg.positionX * Brick::BRICK_SIZE), (msg.positionY * Brick::BRICK_SIZE));
 				singleGame->placeNewTetromino(tetPos, (TetrominoType)msg.tetrominoType);
 			}
 			else
 			{
 				//MULTI
+				coopGame->placeNewTetromino(tetPos, (TetrominoType)msg.tetrominoType, msg.userId);
 			}
 		}
 			break;
@@ -66,6 +67,7 @@ void ServerListenerThread::runServerListener()
 				else
 				{
 					//MULTI
+					coopGame->forwardMoveCommand(msg);
 				}
 				break;
 			case MoveType::LEFT:
@@ -76,6 +78,7 @@ void ServerListenerThread::runServerListener()
 				else
 				{
 					//MULTI
+					coopGame->forwardMoveCommand(msg);
 				}
 				break;
 			case MoveType::DOWN:
@@ -86,6 +89,7 @@ void ServerListenerThread::runServerListener()
 				else
 				{
 					//MULTI
+					coopGame->forwardMoveCommand(msg);
 				}
 				break;
 			case MoveType::ROTATE:
@@ -96,6 +100,7 @@ void ServerListenerThread::runServerListener()
 				else
 				{
 					//MULTI
+					coopGame->forwardMoveCommand(msg);
 				}
 				break;
 			case MoveType::DROP:
@@ -106,6 +111,7 @@ void ServerListenerThread::runServerListener()
 				else
 				{
 					//MULTI
+					coopGame->forwardMoveCommand(msg);
 				}
 				break;
 			}

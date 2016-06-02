@@ -18,6 +18,8 @@ public:
 	shared_ptr<Tetromino> getActiveTetromino();
 	sf::Vector2i getStartPosition();
 	void setStartPosition(int startPosition);
+	bool gotFirstBrick = false;
+	int translation = 0;
 private:
 	string nick;
 	int score;

@@ -8,22 +8,30 @@ CooperationGame::CooperationGame(shared_ptr<LocalPlayer> ownerPlayer, vector<str
 {
 	for (string nick : otherPlayersNicknames)
 	{
-		if (nick != ownerPlayer->getNick())
+		if (nick == ownerPlayer->getNick())
+		{
+			ownerPlayer->translation = numOfPlayers;
+		}
+		else
 		{
 			Player p(nick);
+			p.translation = numOfPlayers;
 			otherPlayers.push_back(p);
 		}
+		numOfPlayers++;
+		
 	}
 }
 
 
 CooperationGame::~CooperationGame()
 {
+
 }
 
 void CooperationGame::run()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 400), "Tetris Multiplayer");
+	sf::RenderWindow window(sf::VideoMode(numOfPlayers*200, 400), "Tetris Multiplayer");
 	window.setActive(true);
 	while (window.isOpen())
 	{
@@ -52,14 +60,16 @@ void CooperationGame::displayInWindow(sf::RenderWindow & window)
 	}
 	for (Player p : otherPlayers)
 	{
-		Tetromino activeTetromino = *p.getActiveTetromino();
-		for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
-		{
-			window.draw(rectangle);
-		}
-		for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
-		{
-			window.draw(rectangle);
+		if (p.gotFirstBrick) {
+			Tetromino activeTetromino = *p.getActiveTetromino();
+			for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
+			{
+				window.draw(rectangle);
+			}
+			for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
+			{
+				window.draw(rectangle);
+			}
 		}
 	}
 	window.display();
@@ -121,7 +131,7 @@ void CooperationGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type, st
 			shared_ptr<Tetromino> previousTetromino = ownerPlayer->getActiveTetromino();
 			notActiveTetrominos.addTetrisShape(previousTetromino);
 		}
-
+		pos.x += 200 * ownerPlayer->translation;
 		shared_ptr<Tetromino> newTetromino = tetrominoFactory.getTetromino(pos, type);
 		ownerPlayer->setActiveTetromino(newTetromino);
 		firstBrick = false;
@@ -137,10 +147,11 @@ void CooperationGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type, st
 					shared_ptr<Tetromino> previousTetromino = ownerPlayer->getActiveTetromino();
 					notActiveTetrominos.addTetrisShape(previousTetromino);
 				}
-
+				pos.x += 200 * p.translation;
 				shared_ptr<Tetromino> newTetromino = tetrominoFactory.getTetromino(pos, type);
 				ownerPlayer->setActiveTetromino(newTetromino);
 				firstBrick = false;
+				p.gotFirstBrick = true;
 				break;
 			}
 		}
@@ -159,4 +170,32 @@ void CooperationGame::moveDownAllActiveBlocks()
 void CooperationGame::endGameCloseWindow()
 {
 	closeWindow = true;
+}
+
+void CooperationGame::forwardMoveCommand(MoveMsg msg)
+{
+	if (msg.userId == ownerPlayer->getNick())
+	{
+		switch (msg.moveType)
+		{
+		case MoveType::DOWN:
+			ownerPlayer->getActiveTetromino()->moveDown();
+			break;
+		}
+	}
+	else
+	{
+		for (Player p : otherPlayers)
+		{
+			if (msg.userId == p.getNick())
+			{
+				switch (msg.moveType)
+				{
+				case MoveType::DOWN:
+					//p.getActiveTetromino()->moveDown();
+					break;
+				}
+			}
+		}
+	}
 }
