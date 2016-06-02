@@ -54,10 +54,6 @@ void CooperationGame::displayInWindow(sf::RenderWindow & window)
 	{
 		window.draw(rectangle);
 	}
-	for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
-	{
-		window.draw(rectangle);
-	}
 	for (Player p : otherPlayers)
 	{
 		if (p.gotFirstBrick) {
@@ -66,11 +62,11 @@ void CooperationGame::displayInWindow(sf::RenderWindow & window)
 			{
 				window.draw(rectangle);
 			}
-			for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
-			{
-				window.draw(rectangle);
-			}
 		}
+	}
+	for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
+	{
+		window.draw(rectangle);
 	}
 	window.display();
 }
@@ -149,7 +145,7 @@ void CooperationGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type, st
 				}
 				pos.x += 200 * p.translation;
 				shared_ptr<Tetromino> newTetromino = tetrominoFactory.getTetromino(pos, type);
-				ownerPlayer->setActiveTetromino(newTetromino);
+				p.setActiveTetromino(newTetromino);
 				firstBrick = false;
 				p.gotFirstBrick = true;
 				break;
@@ -187,7 +183,7 @@ void CooperationGame::forwardMoveCommand(MoveMsg msg)
 	{
 		for (Player p : otherPlayers)
 		{
-			if (msg.userId == p.getNick())
+			if (msg.userId == p.getNick() && p.gotFirstBrick == true)
 			{
 				switch (msg.moveType)
 				{

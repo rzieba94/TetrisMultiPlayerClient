@@ -9,7 +9,6 @@ ParentGameEngine::ParentGameEngine() : notActiveTetrominos(sf::Vector2i(100, 200
 	this->startTime = clock();
 }
 
-
 ParentGameEngine::~ParentGameEngine()
 {
 }
