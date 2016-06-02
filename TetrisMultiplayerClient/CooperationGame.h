@@ -18,7 +18,7 @@ private:
 	void moveDownAllActiveBlocks();
 	void checkPlayersMove(sf::RenderWindow & window);
 	shared_ptr<LocalPlayer> ownerPlayer;
-	list<Player> otherPlayers;
+	list<shared_ptr<Player>> otherPlayers;
 	bool firstBrick;
 	bool closeWindow;
 	int numOfPlayers = 0;
