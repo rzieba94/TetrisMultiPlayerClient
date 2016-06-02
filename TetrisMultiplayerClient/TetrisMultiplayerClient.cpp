@@ -40,7 +40,7 @@ int main()
 	sf::Socket::Status status = socket->connect(serverIp, serverPort);
 	if (status != sf::Socket::Done)
 	{
-		cout << "Podczas laczenia z serwerem wystapil blad.";
+		cout << "Podczas laczenia z serwerem wystapil blad." << endl;
 	}
 
 	sf::Packet packet;
@@ -53,11 +53,11 @@ int main()
 	packet >> msg.cmd >> msg.status;
 	if (msg.cmd != connStatus || msg.status == "rejected")
 	{
-		cout << "Podczas laczenia z serwerem wystapil blad";
+		cout << "Podczas laczenia z serwerem wystapil blad" << endl;
 	}
 	else if (msg.status == "accepted")
 	{
-		cout << "Nawiazano polaczenie z serwerem gry.";
+		cout << "Nawiazano polaczenie z serwerem gry." << endl;
 		isConnectionOk = true;
 	}
 	if (isConnectionOk)
