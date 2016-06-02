@@ -69,6 +69,33 @@ void Tetromino::clearLine(int lineNumber)
 {
 	if (lineNumber != -1)
 	{
+		//list<shared_ptr<Brick>>::iterator it = bricksList.begin();
+		list<shared_ptr<Brick>> bricksToErase;
+		for (shared_ptr<Brick> brick : bricksList)
+		{
+
+			int brickPositionY = brick->getPosition().y;
+			int clearedLine = lineNumber * Brick::BRICK_SIZE;
+			if (brickPositionY == clearedLine)
+			{
+				//it = bricksList.erase(it);
+				bricksToErase.push_back(brick);
+			}
+			else
+			{
+
+				if (brickPositionY < clearedLine)
+				{
+					brick->move(sf::Vector2i(0, Brick::BRICK_SIZE));
+				}
+				//++it;
+			}
+		}
+		for (shared_ptr<Brick> brickToKill : bricksToErase)
+		{
+			bricksList.remove(brickToKill);
+		}
+		/*
 		list<shared_ptr<Brick>>::iterator it = bricksList.begin();
 		while (it != bricksList.end())
 		{
@@ -87,6 +114,7 @@ void Tetromino::clearLine(int lineNumber)
 				++it;
 			}
 		}
+		*/
 	}
 }
 
