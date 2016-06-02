@@ -29,5 +29,5 @@ If you have other version of Visual Studio there is a link for sfml library: htt
 ##Diagramy:
 Diagram klas serwera: https://github.com/rzieba94/TetrisMultiPlayerClient/blob/master/diagrams/diagram_klas_serwer.png
 Diagram klas klienta: https://github.com/rzieba94/TetrisMultiPlayerClient/blob/master/diagrams/diagram_klas_klient.png
-Diagram przypadków użycia: https://github.com/rzieba94/TetrisMultiPlayerClient/blob/master/diagrams/diagram_przypadkow_u%C5%BCycia.jpg
+Diagram przypadków użycia: https://github.com/rzieba94/TetrisMultiPlayerClient/blob/master/diagrams/diagram_przypadkow_użycia.jpg
 Diagram aktywności: https://github.com/rzieba94/TetrisMultiPlayerClient/blob/master/diagrams/diagram_aktywnosci.jpg
