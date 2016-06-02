@@ -10,7 +10,6 @@ public:
 	SingleGame(shared_ptr<LocalPlayer> player);
 	~SingleGame();
 	void placeNewTetromino(sf::Vector2i pos,TetrominoType type);
-	void clearLine(int lineNumber);
 	void endGameCloseWindow();
 	void run();
 private:

@@ -121,7 +121,14 @@ void ServerListenerThread::runServerListener()
 		{
 			ClearLine msg;
 			incomingPacket >> msg.lineNumber;
-			singleGame->clearLine(msg.lineNumber);
+			if (singleplayer)
+			{
+				singleGame->clearLine(msg.lineNumber);
+			}
+			else
+			{
+				coopGame->clearLine(msg.lineNumber);
+			}
 		}
 			break;
 		case Cmds::addScore:

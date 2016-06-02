@@ -12,6 +12,7 @@ public:
 	ParentGameEngine();
 	virtual ~ParentGameEngine();
 	void startThread();
+	void clearLine(int lineNumber);
 	virtual void run() = 0;
 protected:
 	virtual void moveDownAllActiveBlocks() = 0;

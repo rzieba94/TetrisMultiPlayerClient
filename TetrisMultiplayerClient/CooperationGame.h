@@ -10,7 +10,6 @@ public:
 	~CooperationGame();
 	void placeNewTetromino(sf::Vector2i pos, TetrominoType type, string playerNick);
 	void forwardMoveCommand(MoveMsg msg);
-	void clearLine(int lineNumber);
 	void endGameCloseWindow();
 	void run();
 private:

@@ -18,3 +18,8 @@ void ParentGameEngine::startThread()
 {
 	gameThread = thread(&ParentGameEngine::run, this);
 }
+
+void ParentGameEngine::clearLine(int lineNumber)
+{
+	notActiveTetrominos.clearLine(lineNumber);
+}

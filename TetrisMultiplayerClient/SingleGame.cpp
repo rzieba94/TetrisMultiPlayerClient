@@ -49,11 +49,6 @@ void SingleGame::displayInWindow(sf::RenderWindow & window)
 	window.display();
 }
 
-void SingleGame::clearLine(int lineNumber)
-{
-	notActiveTetrominos.clearLine(lineNumber);
-}
-
 void SingleGame::endGameCloseWindow()
 {
 	closeWindow = true;
