@@ -1,7 +1,5 @@
 #pragma once
 #include "ParentGameEngine.h"
-#include "LocalPlayer.h"
-#include "RemoteCmds.h"
 
 class CooperationGame : public ParentGameEngine
 {
@@ -10,16 +8,6 @@ public:
 	~CooperationGame();
 	void placeNewTetromino(sf::Vector2i pos, TetrominoType type, string playerNick);
 	void forwardMoveCommand(MoveMsg msg);
-	void endGameCloseWindow();
 	void run();
-private:
-	void displayInWindow(sf::RenderWindow & window);
-	void moveDownAllActiveBlocks();
-	void checkPlayersMove(sf::RenderWindow & window);
-	shared_ptr<LocalPlayer> ownerPlayer;
-	list<shared_ptr<Player>> otherPlayers;
-	bool firstBrick;
-	bool closeWindow;
-	int numOfPlayers = 0;
 };
 

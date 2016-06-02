@@ -4,7 +4,7 @@
 #include "RemoteCmds.h"
 
 
-CooperationGame::CooperationGame(shared_ptr<LocalPlayer> ownerPlayer, vector<string> otherPlayersNicknames) : ownerPlayer(ownerPlayer), firstBrick(true), closeWindow(false)
+CooperationGame::CooperationGame(shared_ptr<LocalPlayer> ownerPlayer, vector<string> otherPlayersNicknames) : ParentGameEngine(ownerPlayer)
 {
 	for (string nick : otherPlayersNicknames)
 	{
@@ -41,91 +41,18 @@ void CooperationGame::run()
 	}
 }
 
-void CooperationGame::displayInWindow(sf::RenderWindow & window)
-{
-	window.clear();
-	Tetromino activeTetromino = *ownerPlayer->getActiveTetromino();
-	for (sf::RectangleShape rectangle : activeTetromino.getDrawableItems())
-	{
-		window.draw(rectangle);
-	}
-	for (shared_ptr<Player> p : otherPlayers)
-	{
-		if (p->gotFirstBrick) {
-			shared_ptr<Tetromino> remotePlayerTetromino = p->getActiveTetromino();
-			for (sf::RectangleShape rectangle : remotePlayerTetromino->getDrawableItems())
-			{
-				window.draw(rectangle);
-			}
-		}
-	}
-	for (sf::RectangleShape rectangle : notActiveTetrominos.getDrawableItems())
-	{
-		window.draw(rectangle);
-	}
-	window.display();
-}
-
-void CooperationGame::checkPlayersMove(sf::RenderWindow & window)
-{
-	sf::Event event;
-	while (window.pollEvent(event))
-	{
-		if (event.type == sf::Event::Closed)
-		{
-			SimpleCommand msg;
-			msg.cmd = Cmds::endGame;
-			sf::Packet closePacket;
-			closePacket << msg.cmd;
-			ownerPlayer->send(closePacket);
-			window.close();
-		}
-		else if (event.type == sf::Event::KeyPressed)
-		{
-			MoveMsg msg;
-			msg.cmd = Cmds::move;
-			msg.userId = ownerPlayer->getNick();
-			msg.dropCount = 0;
-			if (event.key.code == sf::Keyboard::Right)
-			{
-				msg.moveType = MoveType::RIGHT;
-			}
-			else if (event.key.code == sf::Keyboard::Left)
-			{
-				msg.moveType = MoveType::LEFT;
-			}
-			else if (event.key.code == sf::Keyboard::Down)
-			{
-				msg.moveType = MoveType::DOWN;
-			}
-			else if (event.key.code == sf::Keyboard::Up)
-			{
-				msg.moveType = MoveType::ROTATE;
-			}
-			else if (event.key.code == sf::Keyboard::Space)
-			{
-				msg.moveType = MoveType::DROP;
-			}
-			sf::Packet movePacket;
-			movePacket.clear();
-			movePacket << msg.cmd << msg.moveType << msg.userId << msg.dropCount;
-			ownerPlayer->send(movePacket);
-		}
-	}
-}
-
 void CooperationGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type, string playerNick)
 {
-	if (playerNick == ownerPlayer->getNick()) {
-		if (ownerPlayer->gotFirstBrick)
+	if (playerNick == localPlayer->getNick()) {
+		if (localPlayer->gotFirstBrick)
 		{
-			shared_ptr<Tetromino> previousTetromino = ownerPlayer->getActiveTetromino();
+			shared_ptr<Tetromino> previousTetromino = localPlayer->getActiveTetromino();
 			notActiveTetrominos.addTetrisShape(previousTetromino);
 		}
 		shared_ptr<Tetromino> newTetromino = tetrominoFactory.getTetromino(pos, type);
-		ownerPlayer->setActiveTetromino(newTetromino);
+		localPlayer->setActiveTetromino(newTetromino);
 		firstBrick = false;
-		ownerPlayer->gotFirstBrick = true;
+		localPlayer->gotFirstBrick = true;
 	}
 	else
 	{
@@ -148,40 +75,26 @@ void CooperationGame::placeNewTetromino(sf::Vector2i pos, TetrominoType type, st
 	}
 }
 
-void CooperationGame::moveDownAllActiveBlocks()
-{
-	ownerPlayer->getActiveTetromino()->moveDown();
-	for (shared_ptr<Player> p : otherPlayers)
-	{
-		p->getActiveTetromino()->moveDown();
-	}
-}
-
-void CooperationGame::endGameCloseWindow()
-{
-	closeWindow = true;
-}
-
 void CooperationGame::forwardMoveCommand(MoveMsg msg)
 {
-	if (msg.userId == ownerPlayer->getNick())
+	if (msg.userId == localPlayer->getNick())
 	{
 		switch (msg.moveType)
 		{
 		case MoveType::DOWN:
-			ownerPlayer->getActiveTetromino()->moveDown();
+			localPlayer->getActiveTetromino()->moveDown();
 			break;
 		case MoveType::RIGHT:
-			ownerPlayer->getActiveTetromino()->moveRight();
+			localPlayer->getActiveTetromino()->moveRight();
 			break;
 		case MoveType::LEFT:
-			ownerPlayer->getActiveTetromino()->moveLeft();
+			localPlayer->getActiveTetromino()->moveLeft();
 			break;
 		case MoveType::ROTATE:
-			ownerPlayer->getActiveTetromino()->rotate();
+			localPlayer->getActiveTetromino()->rotate();
 			break;
 		case MoveType::DROP:
-			ownerPlayer->getActiveTetromino()->drop(msg.dropCount);
+			localPlayer->getActiveTetromino()->drop(msg.dropCount);
 			break;
 		}
 		
