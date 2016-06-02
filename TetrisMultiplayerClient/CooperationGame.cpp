@@ -171,7 +171,20 @@ void CooperationGame::forwardMoveCommand(MoveMsg msg)
 		case MoveType::DOWN:
 			ownerPlayer->getActiveTetromino()->moveDown();
 			break;
+		case MoveType::RIGHT:
+			ownerPlayer->getActiveTetromino()->moveRight();
+			break;
+		case MoveType::LEFT:
+			ownerPlayer->getActiveTetromino()->moveLeft();
+			break;
+		case MoveType::ROTATE:
+			ownerPlayer->getActiveTetromino()->rotate();
+			break;
+		case MoveType::DROP:
+			ownerPlayer->getActiveTetromino()->drop(msg.dropCount);
+			break;
 		}
+		
 	}
 	else
 	{
@@ -184,7 +197,20 @@ void CooperationGame::forwardMoveCommand(MoveMsg msg)
 				case MoveType::DOWN:
 					p->getActiveTetromino()->moveDown();
 					break;
+				case MoveType::RIGHT:
+					p->getActiveTetromino()->moveRight();
+					break;
+				case MoveType::LEFT:
+					p->getActiveTetromino()->moveLeft();
+					break;
+				case MoveType::ROTATE:
+					p->getActiveTetromino()->rotate();
+					break;
+				case MoveType::DROP:
+					p->getActiveTetromino()->drop(msg.dropCount);
+					break;
 				}
+				break;
 			}
 		}
 	}
