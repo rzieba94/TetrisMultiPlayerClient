@@ -13,11 +13,25 @@
 #include "LocalPlayer.h"
 #include "Cmds.h"
 #include "ServerListenerThread.h"
+#include <Windows.h>
+
+shared_ptr<LocalPlayer> localPlayer;
+
+bool WINAPI HandlerRoutine(DWORD dwCtrlType)
+{
+	SimpleCommand msg;
+	msg.cmd = Cmds::endServer;
+	sf::Packet endPacket;
+	endPacket << msg.cmd << msg.winner;
+	localPlayer->send(endPacket);
+	return dwCtrlType == CTRL_CLOSE_EVENT;
+}
 
 using namespace std;
 
 int main()
 {
+
 	string serverIp, nick;
 	int serverPort;
 	bool isConnectionOk = false;
@@ -44,7 +58,7 @@ int main()
 	}
 
 	sf::Packet packet;
-	int cmd = connect;
+	int cmd = Cmds::connectGame;
 	packet << cmd << nick;
 	socket->send(packet);
 	packet.clear();
@@ -62,7 +76,7 @@ int main()
 	}
 	if (isConnectionOk)
 	{
-		shared_ptr<LocalPlayer> localPlayer = shared_ptr<LocalPlayer>(new LocalPlayer(nick, socket));
+		localPlayer = shared_ptr<LocalPlayer>(new LocalPlayer(nick, socket));
 		ServerListenerThread mainGameListener(localPlayer);
 		mainGameListener.launchListeners();
 	}

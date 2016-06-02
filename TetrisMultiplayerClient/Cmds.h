@@ -2,7 +2,7 @@
 
 enum Cmds
 {
-	connect = 0,
+	connectGame = 0,
 	connStatus = 1,
 	move = 2,
 	startGame = 3,
