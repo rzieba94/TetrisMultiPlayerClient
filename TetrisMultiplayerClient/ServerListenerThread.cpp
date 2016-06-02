@@ -235,9 +235,19 @@ void ServerListenerThread::runClientListener()
 				vector<string> ids = StringSplitter::split(glist.gamesIds, ';');
 				vector<string> nicknames = StringSplitter::split(glist.nickNames, '|');
 				int i = 0;
+				bool nogames = true;
 				for (string id : ids)
 				{
+					nogames = false;
 					cout << id <<"  |  " << nicknames[i++] << endl;
+				}
+				if (nogames)
+				{
+					cout << "Nie znaleziono gier. Wcisnij enter aby wróciæ do menu." << endl;
+					std::cin.ignore();
+					std::cin.ignore();
+					system("cls");
+					runClientListener();
 				}
 				int selectedID = -1;
 				cin >> selectedID;
