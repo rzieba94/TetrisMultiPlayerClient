@@ -46,6 +46,10 @@ void ServerListenerThread::runServerListener()
 				sf::Vector2i tetPos((msg.positionX * Brick::BRICK_SIZE), (msg.positionY * Brick::BRICK_SIZE));
 				singleGame->placeNewTetromino(tetPos, (TetrominoType)msg.tetrominoType);
 			}
+			else
+			{
+				//MULTI
+			}
 		}
 			break;
 		case Cmds::move:
@@ -55,19 +59,54 @@ void ServerListenerThread::runServerListener()
 			switch (msg.moveType)
 			{
 			case MoveType::RIGHT:
-				localPlayer->getActiveTetromino()->moveRight();
+				if (singleplayer)
+				{
+					localPlayer->getActiveTetromino()->moveRight();
+				}
+				else
+				{
+					//MULTI
+				}
 				break;
 			case MoveType::LEFT:
-				localPlayer->getActiveTetromino()->moveLeft();
+				if (singleplayer)
+				{
+					localPlayer->getActiveTetromino()->moveLeft();
+				}
+				else
+				{
+					//MULTI
+				}
 				break;
 			case MoveType::DOWN:
-				localPlayer->getActiveTetromino()->moveDown();
+				if (singleplayer)
+				{
+					localPlayer->getActiveTetromino()->moveDown();
+				}
+				else
+				{
+					//MULTI
+				}
 				break;
 			case MoveType::ROTATE:
-				localPlayer->getActiveTetromino()->rotate();
+				if (singleplayer)
+				{
+					localPlayer->getActiveTetromino()->rotate();
+				}
+				else
+				{
+					//MULTI
+				}
 				break;
 			case MoveType::DROP:
-				localPlayer->getActiveTetromino()->drop(msg.dropCount);
+				if (singleplayer)
+				{
+					localPlayer->getActiveTetromino()->drop(msg.dropCount);
+				}
+				else
+				{
+					//MULTI
+				}
 				break;
 			}
 		}
@@ -99,8 +138,16 @@ void ServerListenerThread::runServerListener()
 			isRunning = false;
 			bool winner = false;
 			incomingPacket >> winner;
-			singleGame->endGameCloseWindow();
-			delete(singleGame);
+			if (singleplayer)
+			{
+				singleGame->endGameCloseWindow();
+				delete(singleGame);
+			}
+			else
+			{
+				coopGame->endGameCloseWindow();
+				delete(coopGame);
+			}
 			if (!winner)
 			{
 				cout << "Koniec gry " << localPlayer->getNick() << "! Uzyskales " << localPlayer->getScore() << " punktow!" << endl;
@@ -229,10 +276,11 @@ void ServerListenerThread::runClientListener()
 			{
 				gameStarted = true;
 				singleplayer = false;
-				singleGame = new SingleGame(localPlayer);
-				thread singleGameThread(&SingleGame::run, singleGame);
+				vector<string> otherPlayersNicks = StringSplitter::split(msg.userIds, ';');
+				coopGame = new CooperationGame(localPlayer, otherPlayersNicks);
+				thread coopGameThread(&CooperationGame::run, coopGame);
 				thread serverListener(&ServerListenerThread::runServerListener, this);
-				singleGameThread.join();
+				coopGameThread.join();
 				serverListener.join();
 			}
 		}

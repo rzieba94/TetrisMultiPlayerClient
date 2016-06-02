@@ -14,7 +14,6 @@ public:
 	void endGameCloseWindow();
 	void run();
 private:
-	
 	void displayInWindow(sf::RenderWindow & window);
 	void moveDownAllActiveBlocks();
 	void checkPlayersMove(sf::RenderWindow & window);
